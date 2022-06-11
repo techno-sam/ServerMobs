@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "server_mobs",
+  "version": "${version}",
+
+  "name": "Server Mobs",
+  "description": "Create mobs serverside",
+  "authors": [
+    "Slimeist"
+  ],
+  "contact": {
+    "homepage": "https://github.com/techno-sam/ServerMobs",
+    "sources": "https://github.com/techno-sam/ServerMobs"
+  },
+
+  "license": "GPL v3",
+  "icon": "assets/server_mobs/icon.png",
+
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "com.slimeist.server_mobs.ServerMobsMod"
+    ]
+  },
+  "mixins": [
+    "server_mobs.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.6",
+    "fabric": "*",
+    "minecraft": "~1.18.2",
+    "java": ">=17",
+    "polymer": "*",
+    "server_translations_api": "*",
+    "hologram-api": "*"
+  }
+}

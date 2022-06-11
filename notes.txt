@@ -1,0 +1,4 @@
+Big armor stand transform down:
+    19/16 (1.1875)
+Small armor stand transform down:
+    0.4475

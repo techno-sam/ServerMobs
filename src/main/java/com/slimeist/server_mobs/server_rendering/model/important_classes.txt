@@ -1,0 +1,10 @@
+net.minecraft.client.render.entity.model.:
+    EntityModel (Maybe)
+    SnowGolemEntityModel
+
+net.minecraft.client.model.:
+    ModelUtil
+    ModelPart
+    ModelPartBuilder
+    ModelPartData?
+    ModelTransform

@@ -1,0 +1,8 @@
+{
+  "item.jetpack.jetpack": "Fueled Jetpack",
+  "item.jetpack.jetpack.empty": "Empty Jetpack",
+  "item.jetpack.jetpack_button": "Jetpack Thruster Control",
+
+  "jetpack.tooltip.button": "Use while wearing jetpack to fly.",
+  "jetpack.tooltip.jetpack.empty": "Refuel by using coal while wearing."
+}
