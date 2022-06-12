@@ -9,4 +9,6 @@ public interface IServerRenderedEntity {
     BakedServerEntityModel.Instance getModelInstance();
 
     BakedServerEntityModel getBakedModel();
+
+    void setupAngles();
 }

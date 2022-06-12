@@ -1,8 +1,12 @@
 package com.slimeist.server_mobs.server_rendering.model.elements;
 
+import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import net.minecraft.util.math.Vec3f;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ModelGroup implements IBakedModelPart {
     public final String name;
@@ -11,6 +15,19 @@ public class ModelGroup implements IBakedModelPart {
     public final ModelBox[] boxes;
     public final String uuid;
     protected PolymerModelData displayData = null;
+
+    public ModelGroup copy() {
+        return new ModelGroup(name, transform, childGroups, boxes, uuid, displayData);
+    }
+
+    protected ModelGroup(String name, ModelTransform transform, ModelGroup[] childGroups, ModelBox[] boxes, String uuid, PolymerModelData displayData) {
+        this.name = name;
+        this.transform = transform;
+        this.childGroups = childGroups;
+        this.boxes = boxes;
+        this.uuid = uuid;
+        this.displayData = displayData;
+    }
 
     public ModelGroup(String name, ModelTransform transform, ModelGroup[] childGroups, ModelBox[] boxes, String uuid) {
         this.name = name;
@@ -25,6 +42,13 @@ public class ModelGroup implements IBakedModelPart {
             b.to.subtract(origin);
             wipBoxes[i] = b.build();
         }*/
+        ArrayList<String> names = new ArrayList<>();
+        Arrays.stream(this.childGroups).forEach((modelGroup -> {
+            if (names.contains(modelGroup.name)) {
+                ServerMobsMod.LOGGER.warn("Duplicate name: "+modelGroup.name);
+            }
+            names.add(modelGroup.name);
+        }));
         this.boxes = boxes;
         this.uuid = uuid;
     }
@@ -36,6 +60,12 @@ public class ModelGroup implements IBakedModelPart {
             }
         }
         return null;
+    }
+
+    public String[] getChildNames() {
+        ArrayList<String> names = new ArrayList<>();
+        Arrays.stream(this.childGroups).forEach((modelGroup -> names.add(modelGroup.name)));
+        return names.toArray(new String[0]);
     }
 
     @Override

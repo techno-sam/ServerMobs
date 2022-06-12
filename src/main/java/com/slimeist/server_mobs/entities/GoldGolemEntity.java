@@ -28,6 +28,7 @@ import net.minecraft.server.world.EntityTrackingListener;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -58,10 +59,10 @@ public class GoldGolemEntity extends GolemEntity implements PolymerEntity, Range
     @Override
     protected void initGoals() {
         this.goalSelector.add(1, new ProjectileAttackGoal(this, 1.25, 20, 10.0f));
-        this.goalSelector.add(2, new WanderAroundFarGoal((PathAwareEntity)this, 1.0, 1.0000001E-5f));
+        this.goalSelector.add(2, new WanderAroundFarGoal(this, 1.0, 1.0000001E-5f));
         this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 6.0f));
         this.goalSelector.add(4, new LookAroundGoal(this));
-        this.targetSelector.add(1, new ActiveTargetGoal<MobEntity>(this, MobEntity.class, 10, true, false, entity -> entity instanceof Monster));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, MobEntity.class, 10, true, false, entity -> entity instanceof Monster));
     }
 
     public static DefaultAttributeContainer.Builder createGoldGolemAttributes() {
@@ -133,7 +134,7 @@ public class GoldGolemEntity extends GolemEntity implements PolymerEntity, Range
         data.add(new DataTracker.Entry<>(SnowGolemEntityAccessor.getSNOW_GOLEM_FLAGS(), (byte) 0));
         byte baseFlag = 0;
         baseFlag = modifyFlag(baseFlag, 5, true); //set invisible
-        baseFlag = modifyFlag(baseFlag, 6, true); //set glowing
+        baseFlag = modifyFlag(baseFlag, 6, false); //set glowing
         data.add(new DataTracker.Entry<>(FLAGS, baseFlag));
         data.add(new DataTracker.Entry<>(EntityAccessor.getSILENT(), false));
         data.add(new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(new LiteralText("Gold Golem"))));
@@ -156,6 +157,15 @@ public class GoldGolemEntity extends GolemEntity implements PolymerEntity, Range
     @Override
     public BakedServerEntityModel getBakedModel() {
         return bakedModelSupplier.get();
+    }
+
+    @Override
+    public void setupAngles() {
+        this.getModelInstance().setPartRotation("base.body.head", new EulerAngle(this.getPitch(), this.headYaw, 0));
+        this.getModelInstance().setPartRotation("base.body", new EulerAngle(0, this.bodyYaw+((this.headYaw - this.bodyYaw)*0.25f), 0));
+        this.getModelInstance().setPartRotation("base.body.left_hand", new EulerAngle(0, this.bodyYaw+((this.headYaw - this.bodyYaw)*0.25f), 0));
+        this.getModelInstance().setPartRotation("base.body.right_hand", new EulerAngle(0, this.bodyYaw+((this.headYaw - this.bodyYaw)*0.25f), 0));
+        this.getModelInstance().setPartRotation("base.body_bottom", new EulerAngle(0, this.bodyYaw, 0));
     }
 
     public static void setBakedModelSupplier(Supplier<BakedServerEntityModel> bakedModel) {

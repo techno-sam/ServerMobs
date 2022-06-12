@@ -1,0 +1,17 @@
+f - yaw
+g - tickDelta
+i - light
+
+h - interpolated Body Yaw
+j - interpolated Head Yaw
+k - Head Yaw relative to Body Yaw (j-h) (head - body)
+m - interpolated pitch
+l - animationProgress (entityAge + tickDelta)
+n - interpolated limb distance (How much it is moving???)
+o - interpolated limb angle
+
+call animateModel(livingEntity, o, n, g); #Sub-tick animation, get entity data
+	animatedModel(livingEntity, limbAngle, limbDistance, tickDelta);
+call setAngles(livingEntity, o, n, l, k, m); #Long animation (subtick precision)
+	setAngles(livingEntity, limbAngle, limbDistance, #this is complex anim
+		  animProgress, relativeHeadYaw, pitch)
