@@ -64,7 +64,7 @@ public class ServerEntityModelLoader {
         ModelBox hitbox = this.bakedModel.base().getChild("hitbox").boxes[0];
         Vec3f hitboxSize = hitbox.to().copy();
         hitboxSize.subtract(hitbox.from());
-        ServerMobsMod.LOGGER.info("Entity "+id+"hitbox:\n\tWidth: "+((hitboxSize.getX()+hitboxSize.getZ())/2)+"\n\tHeight: "+hitboxSize.getY());
+        ServerMobsMod.LOGGER.info("Entity "+id+" hitbox:\n\tWidth: "+((hitboxSize.getX()+hitboxSize.getZ())/32)+"\n\tHeight: "+hitboxSize.getY()/16);
         try {
             createItemModel(builder, model_loc_out, this.bakedModel.base().getChild("base"));
         } catch (IOException e) {

@@ -15,3 +15,9 @@ call animateModel(livingEntity, o, n, g); #Sub-tick animation, get entity data
 call setAngles(livingEntity, o, n, l, k, m); #Long animation (subtick precision)
 	setAngles(livingEntity, limbAngle, limbDistance, #this is complex anim
 		  animProgress, relativeHeadYaw, pitch)
+
+
+GUST:
+base.top_spin
+base.middle_spin
+base.bottom_spin

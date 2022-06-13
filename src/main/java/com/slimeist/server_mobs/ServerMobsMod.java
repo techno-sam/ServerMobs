@@ -1,6 +1,7 @@
 package com.slimeist.server_mobs;
 
 import com.slimeist.server_mobs.entities.GoldGolemEntity;
+import com.slimeist.server_mobs.entities.GustEntity;
 import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
@@ -41,6 +42,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		GoldGolemEntity.setBakedModelSupplier(() -> GOLD_GOLEM_LOADER.getBakedModel());
 	}
 
+	public static EntityType<GustEntity> GUST = Registry.register(
+			Registry.ENTITY_TYPE,
+			id("gust"),
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, GustEntity::new).dimensions(EntityDimensions.fixed(0.875f, 1.5f)).trackRangeChunks(8).build()
+	);
+	public static ServerEntityModelLoader GUST_LOADER = new ServerEntityModelLoader(GUST);
+	static {
+		GustEntity.setBakedModelSupplier(() -> GUST_LOADER.getBakedModel());
+	}
+
 	@Override
 	public void onInitializeServer() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -56,7 +67,9 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		}
 		PolymerRPUtils.markAsRequired();
 		FabricDefaultAttributeRegistry.register(GOLD_GOLEM, GoldGolemEntity.createGoldGolemAttributes());
+		FabricDefaultAttributeRegistry.register(GUST, GustEntity.createGustAttributes());
 		PolymerEntityUtils.registerType(GOLD_GOLEM);
+		PolymerEntityUtils.registerType(GUST);
 	}
 
 	public static Identifier id(String path) {

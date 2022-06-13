@@ -13,7 +13,7 @@
     "sources": "https://github.com/techno-sam/ServerMobs"
   },
 
-  "license": "GPL v3",
+  "license": "LGPL v3",
   "icon": "assets/server_mobs/icon.png",
 
   "environment": "server",
