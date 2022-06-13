@@ -6,14 +6,20 @@ import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
 import eu.pb4.holograms.mixin.accessors.SlimeEntityAccessor;
 import eu.pb4.polymer.api.entity.PolymerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.SpiderEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.world.World;
@@ -53,7 +59,11 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
     @Override
     public void setupAngles() {
         this.getModelInstance().setPartRotation("base.top_spin", new EulerAngle(0, (360*(this.age/(20*5f)))%360, 0));
-        this.getModelInstance().setPartRotation("base.middle_spin", new EulerAngle(0, -(360*(this.age/(20*2.5f)))%360, 0));
+        if (this.isAttacking()) {
+            this.getModelInstance().setPartRotation("base.middle_spin", new EulerAngle(0, (360 * (this.age / (20 * 3.5f))) % 360, 0));
+        } else {
+            this.getModelInstance().setPartRotation("base.middle_spin", new EulerAngle(0, -(360 * (this.age / (20 * 2.5f))) % 360, 0));
+        }
         this.getModelInstance().setPartRotation("base.bottom_spin", new EulerAngle(0, (360*(this.age/(20*1.25f)))%360, 0));
     }
 
@@ -93,7 +103,20 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
     //Actual Mob
 
     public static DefaultAttributeContainer.Builder createGustAttributes() {
-        return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 16.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3f);
+        return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 20.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3f).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.5);
+    }
+
+    @Override
+    protected void initGoals() {
+        this.goalSelector.add(1, new SwimGoal(this));
+        this.goalSelector.add(4, new MeleeAttackGoal(this, 1.0, false));
+        this.goalSelector.add(5, new WanderAroundFarGoal(this, 0.8));
+        this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
+        this.goalSelector.add(6, new LookAroundGoal(this));
+        this.targetSelector.add(1, new RevengeGoal(this));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true, true));
+        this.targetSelector.add(3, new ActiveTargetGoal<>(this, IronGolemEntity.class, true, true));
+        this.targetSelector.add(3, new ActiveTargetGoal<>(this, VillagerEntity.class, true, true));
     }
 
     @Override
@@ -105,5 +128,11 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
     @Override
     protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return dimensions.height*0.75f;
+    }
+
+    @Override
+    public void onAttacking(Entity target) {
+        super.onAttacking(target);
+        target.addVelocity(0.0d, 2.0d, 0.0d);
     }
 }
