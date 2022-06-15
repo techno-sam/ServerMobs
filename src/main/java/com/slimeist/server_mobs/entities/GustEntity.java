@@ -6,6 +6,7 @@ import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
 import eu.pb4.holograms.mixin.accessors.SlimeEntityAccessor;
 import eu.pb4.polymer.api.entity.PolymerEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -13,6 +14,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
@@ -20,7 +22,10 @@ import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.world.World;
 
@@ -134,5 +139,31 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
     public void onAttacking(Entity target) {
         super.onAttacking(target);
         target.addVelocity(0.0d, 2.0d, 0.0d);
+    }
+
+    //Sounds
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return SoundEvents.BLOCK_AMETHYST_BLOCK_HIT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK;
+    }
+
+    protected SoundEvent getStepSound() {
+        return SoundEvents.BLOCK_AMETHYST_BLOCK_STEP;
+    }
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        this.playSound(this.getStepSound(), 0.15f, 1.0f);
     }
 }
