@@ -2,16 +2,23 @@ package com.slimeist.server_mobs;
 
 import com.slimeist.server_mobs.entities.GoldGolemEntity;
 import com.slimeist.server_mobs.entities.GustEntity;
+import com.slimeist.server_mobs.entities.MissileEntity;
+import com.slimeist.server_mobs.items.MissileItem;
 import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
+import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
@@ -25,11 +32,10 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	//ITEMS
-	/*public static final Item JETPACK_BUTTON = new JetpackButtonItem(
+	public static final Item MISSILE_ITEM = new MissileItem(
 			new FabricItemSettings()
-					.maxDamage(25)
-					.group(ItemGroup.TRANSPORTATION),
-			Items.CARROT_ON_A_STICK);*/
+					.group(ItemGroup.COMBAT),
+			Items.CARROT_ON_A_STICK);
 
 	//ENTITIES
 	public static EntityType<GoldGolemEntity> GOLD_GOLEM = Registry.register(
@@ -52,6 +58,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		GustEntity.setBakedModelSupplier(() -> GUST_LOADER.getBakedModel());
 	}
 
+	public static EntityType<MissileEntity> MISSILE = Registry.register(
+			Registry.ENTITY_TYPE,
+			id("missile"),
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, MissileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackRangeChunks(8).build()
+	);
+	public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_item.bbmodel");
+	static  {
+		MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());
+	}
+
 	@Override
 	public void onInitializeServer() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -66,10 +82,18 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			LOGGER.error("Failed to mark ServerMobs as asset source");
 		}
 		PolymerRPUtils.markAsRequired();
+		//Items
+		PolymerModelData missileData = PolymerRPUtils.requestModel(Items.CARROT_ON_A_STICK, id("item/missile_item"));
+		((MissileItem) MISSILE_ITEM).setCustomModelData(missileData.value());
+		Registry.register(Registry.ITEM, id("missile"), MISSILE_ITEM);
+
+		//Entities
 		FabricDefaultAttributeRegistry.register(GOLD_GOLEM, GoldGolemEntity.createGoldGolemAttributes());
 		FabricDefaultAttributeRegistry.register(GUST, GustEntity.createGustAttributes());
+		//No attributes for missile, it is not a LivingEntity
 		PolymerEntityUtils.registerType(GOLD_GOLEM);
 		PolymerEntityUtils.registerType(GUST);
+		PolymerEntityUtils.registerType(MISSILE);
 	}
 
 	public static Identifier id(String path) {

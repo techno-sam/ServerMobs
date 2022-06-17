@@ -40,16 +40,25 @@ public class ServerEntityModelLoader {
     public final EntityType<?> entityType;
     protected UnbakedServerEntityModel unbakedModel = null;
     protected BakedServerEntityModel bakedModel = null;
+    private final String model_name_override;
 
     public ServerEntityModelLoader(EntityType<?> entityType) {
+        this(entityType, null);
+    }
+
+    public ServerEntityModelLoader(EntityType<?> entityType, String model_name_override) {
         this.entityType = entityType;
+        if (model_name_override!=null) {
+            model_name_override = model_name_override.replace("..", "");
+        }
+        this.model_name_override = model_name_override;
         PolymerRPUtils.RESOURCE_PACK_CREATION_EVENT.register(this::loadRP);
     }
 
     private void loadRP(PolymerRPBuilder builder) {
         Identifier id = Registry.ENTITY_TYPE.getId(entityType);
         String texture_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + id.getPath() + ".png";
-        String model_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + id.getPath() + ".bbmodel";
+        String model_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + (this.model_name_override==null ? id.getPath() + ".bbmodel" : this.model_name_override);
         String texture_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + ".png";
         String model_loc_out = "assets/" + id.getNamespace() + "/models/entity/" + id.getPath() + "/";
 
@@ -75,6 +84,18 @@ public class ServerEntityModelLoader {
     private Vec3f sub(Vec3f a, Vec3f minus_b) {
         Vec3f tmp = a.copy();
         tmp.subtract(minus_b);
+        return tmp;
+    }
+
+    private Vec3f mul(Vec3f a, int multiplier) {
+        Vec3f tmp = a.copy();
+        tmp.scale(multiplier);
+        return tmp;
+    }
+
+    private Vec3f div(Vec3f a, int divisor) {
+        Vec3f tmp = a.copy();
+        tmp.scale(1.0f/divisor);
         return tmp;
     }
 
@@ -106,6 +127,29 @@ public class ServerEntityModelLoader {
         //Center model around pivot, to disable, set to Vec3f.ZERO
         Vec3f origin = new Vec3f(group.transform.pivotX, group.transform.pivotY, group.transform.pivotZ);
 
+        int divide = 1;
+        for (ModelBox box : group.boxes) {
+            Vec3f from = sub(box.from(), origin);
+            Vec3f to = sub(box.to(), origin);
+            float[] coords = new float[]{
+                    from.getX(),
+                    from.getY(),
+                    from.getZ(),
+                    to.getX(),
+                    to.getY(),
+                    to.getZ()
+            };
+            for (float coord : coords) {
+                while ( ((coord/(float) divide) < -16) || ((coord/(float) divide) > 32) ) {
+                    divide += 1;
+                }
+            }
+        }
+
+        if (divide != 1) {
+            ServerMobsMod.LOGGER.warn("Shrank item model for "+baseLoc+" by "+divide);
+        }
+
         //elements
         int numElements;
         {
@@ -113,8 +157,8 @@ public class ServerEntityModelLoader {
             for (ModelBox box : group.boxes) {
                 JsonObject element = new JsonObject();
                 element.addProperty("name", box.name());
-                element.add("from", JsonUtil.toJsonArray(sub(box.from(), origin)));
-                element.add("to", JsonUtil.toJsonArray(sub(box.to(), origin)));
+                element.add("from", JsonUtil.toJsonArray(div(sub(box.from(), origin), divide)));
+                element.add("to", JsonUtil.toJsonArray(div(sub(box.to(), origin), divide)));
                 {
                     JsonObject faces = new JsonObject();
                     faces.add("north", createFace(box.northUV()));
@@ -139,7 +183,7 @@ public class ServerEntityModelLoader {
                 if (origin.equals(Vec3f.ZERO)) {
                     mainGroup.add("origin", JsonUtil.toJsonArray(Vec3f.ZERO));
                 } else {
-                    mainGroup.add("origin", group.transform.pivotArray());
+                    mainGroup.add("origin", JsonUtil.toJsonArray(div(group.transform.pivotVec(), divide)));
                 }
                 {
                     JsonArray childrenArray = new JsonArray();
@@ -157,7 +201,7 @@ public class ServerEntityModelLoader {
             JsonObject display = new JsonObject();
             ServerMobsMod.LOGGER.warn("Loading display");
             {
-                double s = 1.6/0.7;
+                double s = (1.6/0.7)*divide;
                 JsonObject head = new JsonObject();
                 {
                     JsonArray translation = new JsonArray();

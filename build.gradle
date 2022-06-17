@@ -33,6 +33,10 @@ dependencies {
 	modImplementation include("fr.catcore:server-translations-api:1.4.12+1.18.2")
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/server_mobs.accesswidener")
+}
+
 processResources {
 	inputs.property "version", project.version
 

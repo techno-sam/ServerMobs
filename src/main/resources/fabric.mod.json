@@ -37,5 +37,6 @@
   "recommends": {
     "server_translations_api": "*",
     "polypack_host": "*"
-  }
+  },
+  "accessWidener" : "server_mobs.accesswidener"
 }

@@ -24,18 +24,18 @@ import java.util.*;
 public record BakedServerEntityModel(int texWidth, int texHeight,
                                      ModelGroup base) {
 
-    public <T extends LivingEntity & IServerRenderedEntity> Instance createInstance(T entity) {
+    public <T extends Entity & IServerRenderedEntity> Instance createInstance(T entity) {
         return new Instance(this, entity);
     }
 
     public static class Instance {
         private BakedServerEntityModel parent;
-        private LivingEntity entity;
+        private Entity entity;
         private EntityHologram hologram;
         private HashMap<ModelGroup, ModelDisplayPiece> displayPieces;
         private boolean hologramDirty;
 
-        protected <T extends LivingEntity & IServerRenderedEntity> Instance(BakedServerEntityModel parent, T entity) {
+        protected <T extends Entity & IServerRenderedEntity> Instance(BakedServerEntityModel parent, T entity) {
             this.parent = parent;
             this.entity = entity;
             this.hologram = new EntityHologram(this.entity, Vec3d.ZERO);
@@ -54,7 +54,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         private ModelGroup getModelGroup(String modelPath) {
             String[] pathParts = modelPath.split("\\.");
             ModelGroup modelGroup = parent.base().getChild("base");
-            for (int i = pathParts[0].equals("base") ? 1 : 0; i< pathParts.length; i++) {
+            for (int i = pathParts[0].equals("base") ? 1 : 0; i < pathParts.length; i++) {
                 if (modelGroup == null) {
                     return null;
                 }

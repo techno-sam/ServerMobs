@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs;
+package com.slimeist.server_mobs.util;
 
 import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -1,8 +1,7 @@
 {
-  "item.jetpack.jetpack": "Fueled Jetpack",
-  "item.jetpack.jetpack.empty": "Empty Jetpack",
-  "item.jetpack.jetpack_button": "Jetpack Thruster Control",
+  "item.server_mobs.missile": "Missile",
 
-  "jetpack.tooltip.button": "Use while wearing jetpack to fly.",
-  "jetpack.tooltip.jetpack.empty": "Refuel by using coal while wearing."
+  "server_mobs.tooltip.missile": "Point at target to lock target, then use to fire.",
+  "server_mobs.missile.target_locked": "\u00A7aTarget Locked\u00A7r",
+  "server_mobs.missile.no_target": "\u00A74No Target\u00A7r"
 }
