@@ -5,10 +5,14 @@
   "compatibilityLevel": "JAVA_17",
   "server": [
     "ArmorStandEntityAccessor",
+    "CommandManagerMixin",
     "EntityAccessor",
-    "SnowGolemEntityAccessor"
+    "SnowGolemEntityAccessor",
+    "FireworkRocketEntityAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+  ]
 }

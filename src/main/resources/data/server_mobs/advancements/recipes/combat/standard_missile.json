@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "server_mobs:standard_missile"
+    ]
+  },
+  "criteria": {
+    "has_tnt": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:tnt"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "server_mobs:standard_missile"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_tnt",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -1,37 +1,38 @@
 package com.slimeist.server_mobs.entities;
 
-import com.google.common.base.MoreObjects;
 import com.slimeist.server_mobs.ServerMobsMod;
+import com.slimeist.server_mobs.mixin.FireworkRocketEntityAccessor;
 import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
+import com.slimeist.server_mobs.util.VectorUtil;
 import eu.pb4.polymer.api.entity.PolymerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
+import net.minecraft.entity.projectile.thrown.ThrownEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.particle.DustColorTransitionParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
-import net.minecraft.world.explosion.ExplosionBehavior;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class MissileEntity extends ProjectileEntity implements PolymerEntity, IServerRenderedEntity {
+//Sort of a port of Pneumaticraft's Micromissile
+public class MissileEntity extends ThrownEntity implements PolymerEntity, IServerRenderedEntity {
+
     private static Supplier<BakedServerEntityModel> bakedModelSupplier;
     private BakedServerEntityModel.Instance modelInstance;
 
@@ -43,20 +44,43 @@ public class MissileEntity extends ProjectileEntity implements PolymerEntity, IS
     private double targetX;
     private double targetY;
     private double targetZ;
+
+    //Values from Pneumaticraft
+    private float maxVelocitySq = 0.5f;
+    private float accel = 1.05f; // straight line acceleration
+    private float turnSpeed = 0.1f;
+    private float explosionPower = 2f;
+    private boolean outOfFuel = false;
+    //End values from Pneumaticraft
+
+    private MissileColor colorData = MissileColor.EMPTY;
+    private ItemStack launchStack = ItemStack.EMPTY;
+
     //Constructor
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world) {
         super(entityType, world);
-        this.noClip = true;
     }
 
-    protected MissileEntity(World world, LivingEntity owner, Entity target) {
-        this(ServerMobsMod.MISSILE, world);
-        this.setOwner(owner);
-        this.target = target;
+    protected MissileEntity(EntityType<? extends MissileEntity> entityType, LivingEntity owner, World world) {
+        super(entityType, owner, world);
     }
 
     public static MissileEntity targeting(World world, LivingEntity owner, Entity target) {
-        return new MissileEntity(world, owner, target);
+        MissileEntity missile = new MissileEntity(ServerMobsMod.MISSILE, owner, world);
+        missile.target = target;
+        return missile;
+    }
+
+    public void setColorData(int[] colors, int[] fadeColors) {
+        this.setColorData(new MissileColor(colors, fadeColors));
+    }
+
+    public void setColorData(MissileColor colorData) {
+        this.colorData = colorData;
+    }
+
+    public void setLaunchStack(ItemStack launchStack) {
+        this.launchStack = launchStack;
     }
 
     //IServerRenderedEntity
@@ -81,8 +105,8 @@ public class MissileEntity extends ProjectileEntity implements PolymerEntity, IS
 
     @Override
     public void setupAngles() {
-        this.getModelInstance().setPartRotation("base", new EulerAngle(this.getPitch(), this.getYaw()+180, 0));
         this.getModelInstance().setPartPivot("base", Vec3d.ZERO);
+        this.getModelInstance().setPartRotation("base", new EulerAngle(-this.getPitch(), -this.getYaw(), 0));
     }
 
     public static void setBakedModelSupplier(Supplier<BakedServerEntityModel> bakedModel) {
@@ -138,50 +162,65 @@ public class MissileEntity extends ProjectileEntity implements PolymerEntity, IS
         Vec3d vec3d;
         if (!this.world.isClient) {
             if (this.target == null && this.targetUuid != null) {
-                this.target = ((ServerWorld)this.world).getEntity(this.targetUuid);
+                this.target = ((ServerWorld) this.world).getEntity(this.targetUuid);
                 if (this.target == null) {
                     this.targetUuid = null;
                 }
             }
-            if (this.target != null && this.target.isAlive() && this.target instanceof LivingEntity && !this.target.isSpectator()) {
-                Vec3d center = this.target.getBoundingBox().getCenter();
-                this.targetX = center.getX() - this.getX();
-                this.targetY = center.getY() - this.getY();
-                this.targetZ = center.getZ() - this.getZ();
 
-                /*this.targetX = MathHelper.clamp(this.targetX * 1.025, -1.0, 1.0);
-                this.targetY = MathHelper.clamp(this.targetY * 1.025, -1.0, 1.0);
-                this.targetZ = MathHelper.clamp(this.targetZ * 1.025, -1.0, 1.0);*/
-
-                Vec3d target = new Vec3d(this.targetX, this.targetY, this.targetZ);
-                target.multiply(1.025);
-                target = normalize(target);
-
-                vec3d = this.getVelocity();
-                double scale = 0.1;
-                this.setVelocity(new Vec3d(target.getX()*scale, target.getY()*scale, target.getZ()*scale));//vec3d.add((this.targetX - vec3d.x) * 0.2, (this.targetY - vec3d.y) * 0.2, (this.targetZ - vec3d.z) * 0.2));
-            } else if (!this.hasNoGravity()) {
-                this.setVelocity(this.getVelocity().add(0.0, -0.04, 0.0));
+            if (age > 300) {
+                this.outOfFuel = true;
             }
-            HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
-            if (hitResult.getType() != HitResult.Type.MISS) {
-                this.onCollision(hitResult);
-            }
-            this.checkBlockCollision();
-            vec3d = this.getVelocity();
-            this.setPosition(this.getX() + vec3d.x, this.getY() + vec3d.y, this.getZ() + vec3d.z);
-            ProjectileUtil.setRotationFromVelocity(this, 0.5f);
-            if (!this.world.isClient && (this.target == null || this.target.isRemoved())) {
-                this.goBoom();
-                this.discard();
+
+            //Following block from Pneumaticraft
+            if (!outOfFuel) {
+                // negate default slowdown of projectiles applied in superclass
+                if (this.isTouchingWater()) {
+                    setVelocity(getVelocity().multiply(1.25));
+                } else {
+                    setVelocity(getVelocity().multiply(1 / 0.99));
+                }
+
+                if (target != null && target.isAlive() && !target.isSpectator()) {
+                    // turn toward the target
+                    Vec3d diff = target.getPos().add(0, target.getStandingEyeHeight(), 0).subtract(getPos()).normalize().multiply(turnSpeed);
+                    setVelocity(getVelocity().add(diff));
+                } else {
+                    this.outOfFuel = true;
+                }
+
+                // accelerate up to max velocity but cap there
+                double velSq = getVelocity().lengthSquared();//motionX * motionX + motionY * motionY + motionZ * motionZ;
+                double mul = velSq > maxVelocitySq ? maxVelocitySq / velSq : accel;
+                setVelocity(getVelocity().multiply(mul));
+                if (getEntityWorld() instanceof ServerWorld serverWorld && !colorData.equals(MissileColor.EMPTY)) {
+                    Vec3d m = getVelocity();
+                    Vec3f fromCol = VectorUtil.fireworkColor(colorData.colors()[random.nextInt(colorData.colors().length)]);
+                    Vec3f toCol = fromCol;
+                    if (colorData.fadeColors().length>0) {
+                        toCol = VectorUtil.fireworkColor(colorData.fadeColors()[random.nextInt(colorData.fadeColors().length)]);
+                    }
+                    serverWorld.spawnParticles(new DustColorTransitionParticleEffect(fromCol, toCol, 4.0f), getX(), getY(), getZ(), 0, -m.x / 2, -m.y / 2, -m.z / 2, 1);
+                } else if (getEntityWorld() instanceof ServerWorld serverWorld && getEntityWorld().random.nextBoolean()) {
+                    Vec3d m = getVelocity();
+                    serverWorld.spawnParticles(ParticleTypes.LARGE_SMOKE, getX(), getY(), getZ(), 0, -m.x / 2, -m.y / 2, -m.z / 2, 1);
+                }
+            }//End Pneumaticraft block
+
+            if (this.target != null) {
+                if (this.target.getPos().isInRange(this.getPos(), 0.75)) {
+                    this.onCollision(new EntityHitResult(this.target));
+                }
             }
         }
         this.getModelInstance().updateHologram();
     }
 
+
+
     @Override
     protected boolean canHit(Entity entity) {
-        return super.canHit(entity) && !entity.noClip;
+        return super.canHit(entity) && !entity.noClip && !entity.getType().equals(this.getType());
     }
 
     @Override
@@ -199,36 +238,88 @@ public class MissileEntity extends ProjectileEntity implements PolymerEntity, IS
         return 1.0f;
     }
 
+    //Following method copied from Pneumaticraft
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        super.onEntityHit(entityHitResult);
-        if (entityHitResult.getEntity() != this.getOwner()) {
-            goBoom();
+    protected void onCollision(HitResult hitResult) {
+        if (age > 5 && isAlive()) {
+            goBoom(hitResult instanceof EntityHitResult ? ((EntityHitResult) hitResult).getEntity() : null);
         }
     }
 
-    @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        super.onBlockHit(blockHitResult);
-        //goBoom();
-    }
-
-    @Override
-    protected void onCollision(HitResult hitResult) {
-        super.onCollision(hitResult);
-        this.discard();
-    }
-
-    private void goBoom() {
+    //Folowing method inspired by Pneumaticraft
+    private void goBoom(Entity e) {
+        discard();
         DamageSource source = null;
         if (this.getOwner() instanceof LivingEntity) {
             source = DamageSource.explosion((LivingEntity) this.getOwner());
         }
-        this.world.createExplosion(this, source, null, this.getX(), this.getY(), this.getZ(), 1.5f, false, Explosion.DestructionType.NONE);
+        double x = this.getX();
+        double y = this.getY();
+        double z = this.getZ();
+        //Following if block is from Pneumaticraft
+        if (e != null) {
+            x = MathHelper.lerp(0.25f, e.getX(), getX());
+            y = MathHelper.lerp(0.25f, e.getY(), getY());
+            z = MathHelper.lerp(0.25f, e.getZ(), getZ());
+        }
+        this.world.createExplosion(this, source, null, x, y, z, this.explosionPower, false, Explosion.DestructionType.NONE);
+        if (!this.launchStack.equals(ItemStack.EMPTY)) {
+            if (this.launchStack.hasNbt()) {
+                NbtCompound explosionData = this.launchStack.getSubNbt("Explosion");
+                if (explosionData != null) {
+                    ItemStack fireworkStack = new ItemStack(Items.FIREWORK_ROCKET, 1);
+                    NbtCompound fireworksData = new NbtCompound();
+                    NbtList explosionList = new NbtList();
+                    explosionList.add(explosionData);
+                    fireworksData.put("Explosions", explosionList);
+                    fireworksData.putInt("Flight", 1);
+                    fireworkStack.setSubNbt("Fireworks", fireworksData);
+                    FireworkRocketEntity rocket = new FireworkRocketEntity(this.world, x, y, z, fireworkStack);
+                    this.world.spawnEntity(rocket);
+                    rocket.explodeAndRemove();
+                    //((FireworkRocketEntityAccessor) rocket).setLife(((FireworkRocketEntityAccessor) rocket).getLifeTime()-20);
+                }
+            }
+        }
     }
 
     @Override
     public boolean collides() {
         return true;
+    }
+
+    //Pneumaticraft MicroMissile code for rest of class
+    @Override
+    public void setVelocity(Entity entityThrower, float pitch, float yaw, float pitchOffset, float velocity, float inaccuracy) {
+        float x = -MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F);
+        float y = -MathHelper.sin(pitch * 0.017453292F);
+        float z = MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F);
+        this.setVelocity(x, y, z, velocity, 0f);
+        this.setVelocity(this.getVelocity().add(entityThrower.getVelocity().x, 0, entityThrower.getVelocity().z));
+    }
+
+    @Override
+    public void setVelocity(double x, double y, double z, float velocity, float inaccuracy) {
+        double f = Math.sqrt(x * x + y * y + z * z);
+        x = x / f * velocity;
+        y = y / f * velocity;
+        z = z / f * velocity;
+        this.setVelocity(x, y, z);
+
+        float f1 = MathHelper.sqrt((float) (x * x + z * z));
+        this.setYaw((float)(MathHelper.atan2(x, z) * (180D / Math.PI)));
+        this.setPitch((float)(MathHelper.atan2(y, f1) * (180D / Math.PI)));
+        this.prevYaw = this.getYaw();
+        this.prevPitch = this.getPitch();
+    }
+
+    @Override
+    protected float getGravity() {
+        return outOfFuel ? super.getGravity() : 0F;
+    }
+
+    @Override
+    public boolean hasNoGravity() {
+        return !outOfFuel;
     }
 }

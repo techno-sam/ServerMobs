@@ -35,7 +35,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	public static final Item MISSILE_ITEM = new MissileItem(
 			new FabricItemSettings()
 					.group(ItemGroup.COMBAT),
-			Items.CARROT_ON_A_STICK);
+			Items.BLAZE_ROD);
 
 	//ENTITIES
 	public static EntityType<GoldGolemEntity> GOLD_GOLEM = Registry.register(
@@ -63,7 +63,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			id("missile"),
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, MissileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackRangeChunks(8).build()
 	);
-	public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_item.bbmodel");
+	public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_entity.bbmodel");
 	static  {
 		MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());
 	}
@@ -83,7 +83,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		}
 		PolymerRPUtils.markAsRequired();
 		//Items
-		PolymerModelData missileData = PolymerRPUtils.requestModel(Items.CARROT_ON_A_STICK, id("item/missile_item"));
+		PolymerModelData missileData = PolymerRPUtils.requestModel(Items.BLAZE_ROD, id("item/missile_item"));
 		((MissileItem) MISSILE_ITEM).setCustomModelData(missileData.value());
 		Registry.register(Registry.ITEM, id("missile"), MISSILE_ITEM);
 

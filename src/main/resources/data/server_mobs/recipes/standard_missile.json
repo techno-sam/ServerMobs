@@ -1,0 +1,27 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#T#",
+        "iGi",
+        "iGi"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:iron_trapdoor"
+        },
+        "T": {
+            "item": "minecraft:tnt"
+        },
+        "i": {
+            "item": "minecraft:iron_ingot"
+        },
+        "G": {
+            "item": "minecraft:gunpowder"
+        }
+    },
+    "result": {
+        "item": "server_mobs:missile",
+        "count": 1
+    },
+    "group": "server_mobs:missile"
+}

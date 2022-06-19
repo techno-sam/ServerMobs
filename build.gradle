@@ -17,6 +17,16 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 	maven { url 'https://maven.nucleoid.xyz' }
+	//Nbt Crafting
+	maven {
+		name "Siphalor's Maven"
+		url "https://maven.siphalor.de"
+	}
+	// For some testing dependencies of Nbt Crafting
+	maven {
+		name "Jitpack"
+		url "https://jitpack.io"
+	}
 }
 
 dependencies {

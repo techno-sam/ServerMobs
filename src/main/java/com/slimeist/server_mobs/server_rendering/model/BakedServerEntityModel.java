@@ -65,11 +65,14 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
 
         private void setupArmorStand(String modelPath) {
             ModelGroup group = getModelGroup(modelPath);
+            if (modelPath.equals("hitbox")) {
+                return;
+            }
             if (group == null) {
                 ServerMobsMod.LOGGER.warn("Failed to create armor stand for path "+modelPath+" because that path does not exist.");
                 return;
             } else {
-                ServerMobsMod.LOGGER.info("Creating armor stand for path ["+modelPath+"].");
+                // ServerMobsMod.LOGGER.info("Creating armor stand for path ["+modelPath+"].");
             }
             PolymerModelData data = group.getDisplayData();
             ItemStack displayStack = new ItemStack(data.item(), 1);

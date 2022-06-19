@@ -140,15 +140,21 @@ public class ServerEntityModelLoader {
                     to.getZ()
             };
             for (float coord : coords) {
-                while ( ((coord/(float) divide) < -16) || ((coord/(float) divide) > 32) ) {
+                /*while ( ((coord/(float) divide) < -16) || ((coord/(float) divide) > 32) ) {
                     divide += 1;
+                }*/
+                if ( ((coord/(float) divide) < -16) || ((coord/(float) divide) > 32) ) {
+                    ServerMobsMod.LOGGER.error("Item model for "+baseLoc+" is too big, try moving pivot point. (The model must not extend beyond -16 or 32 in all axes)");
+                    break;
                 }
             }
         }
 
-        if (divide != 1) {
+        divide = 1; //Scale, transforms are limited by Minecraft model loader, so this workaround doesn't work.
+
+        /*if (divide != 1) {
             ServerMobsMod.LOGGER.warn("Shrank item model for "+baseLoc+" by "+divide);
-        }
+        }*/
 
         //elements
         int numElements;
@@ -201,7 +207,7 @@ public class ServerEntityModelLoader {
             JsonObject display = new JsonObject();
             ServerMobsMod.LOGGER.warn("Loading display");
             {
-                double s = (1.6/0.7)*divide;
+                double s = (1.6/0.7);
                 JsonObject head = new JsonObject();
                 {
                     JsonArray translation = new JsonArray();

@@ -1,0 +1,43 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#T#",
+        "iFi",
+        "iGi"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:iron_trapdoor"
+        },
+        "T": {
+            "item": "minecraft:tnt"
+        },
+        "i": {
+            "item": "minecraft:iron_ingot"
+        },
+        "F": {
+            "item": "minecraft:firework_star",
+            "data": {
+                "require": {
+                    "Explosion": ""
+                }
+            }
+        },
+        "G": {
+            "item": "minecraft:gunpowder"
+        }
+    },
+    "result": {
+        "item": "server_mobs:missile",
+        "count": 1,
+        "data": {
+            "$": {
+                "value": "i4",
+                "paths": {
+                    "Explosion": "overwrite"
+                }
+            }
+        }
+    },
+    "group": "server_mobs:missile"
+}
