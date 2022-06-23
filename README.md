@@ -15,7 +15,7 @@ The 'API' (not guaranteed to be stable yet) is under [com.slimeist.server_mobs.s
 * [polymer](https://github.com/Patbox/polymer/tree/dev/1.18.2)
 * [hologram-api](https://github.com/Patbox/HologramAPI/tree/1.18)
 * [nbtcrafting](https://github.com/Siphalor/nbt-crafting/tree/1.18-2.0)
-### Recommneded
+### Recommended
 * [polypack_host](https://github.com/aws404/polypack-host)
 * [server_translations_api](https://github.com/NucleoidMC/Server-Translations/tree/1.18.2)
 
