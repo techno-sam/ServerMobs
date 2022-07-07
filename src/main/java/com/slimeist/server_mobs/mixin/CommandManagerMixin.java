@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs.mixin;
+/*package com.slimeist.server_mobs.mixin;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -21,3 +21,4 @@ public class CommandManagerMixin {
         }
     }
 }
+*/
