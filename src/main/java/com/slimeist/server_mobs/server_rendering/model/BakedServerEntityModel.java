@@ -6,11 +6,11 @@ import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.hologram.ArmorStandHologramElement;
 import com.slimeist.server_mobs.server_rendering.model.elements.ModelGroup;
 import com.slimeist.server_mobs.util.VectorUtil;
+import eu.pb4.holograms.api.elements.HologramElement;
 import eu.pb4.holograms.api.holograms.EntityHologram;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -34,6 +34,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         private EntityHologram hologram;
         private HashMap<ModelGroup, ModelDisplayPiece> displayPieces;
         private boolean hologramDirty;
+        private boolean initializedAngles = false;
 
         protected <T extends Entity & IServerRenderedEntity> Instance(BakedServerEntityModel parent, T entity) {
             this.parent = parent;
@@ -63,6 +64,29 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             return modelGroup;
         }
 
+        @Nullable
+        private String getPath(ModelGroup group) {
+            ModelDisplayPiece piece = this.displayPieces.get(group);
+            return piece==null ? null : piece.path;
+        }
+
+        private ItemStack createDisplayStack(ModelGroup group, boolean damageFlash) {
+            PolymerModelData data = group.getDisplayData();
+            ItemStack displayStack = new ItemStack(data.item(), 1);
+            NbtCompound nbt = displayStack.getOrCreateNbt();
+
+            nbt.putInt("CustomModelData", data.value());
+
+            {
+                NbtCompound display = new NbtCompound();
+                display.putInt("color", damageFlash ? 0xFF9595 : -1); //-1 is white
+                nbt.put("display", display);
+            }
+
+            displayStack.setNbt(nbt);
+            return displayStack;
+        }
+
         private void setupArmorStand(String modelPath) {
             ModelGroup group = getModelGroup(modelPath);
             if (modelPath.equals("hitbox")) {
@@ -74,11 +98,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             } else {
                 // ServerMobsMod.LOGGER.info("Creating armor stand for path ["+modelPath+"].");
             }
-            PolymerModelData data = group.getDisplayData();
-            ItemStack displayStack = new ItemStack(data.item(), 1);
-            NbtCompound nbt = displayStack.getOrCreateNbt();
-            nbt.putInt("CustomModelData", data.value());
-            displayStack.setNbt(nbt);
+            ItemStack displayStack = createDisplayStack(group, false);
 
             ArmorStandEntity armorStand = new ArmorStandEntity(this.entity.getWorld(), this.entity.getX(), this.entity.getY(), this.entity.getZ());
             armorStand.equipStack(EquipmentSlot.HEAD, displayStack);
@@ -87,14 +107,15 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             armorStand.setHeadYaw(0.0f);
             armorStand.setBodyRotation(ArmorStandEntityAccessor.getDEFAULT_BODY_ROTATION());
             armorStand.setHeadRotation(ArmorStandEntityAccessor.getDEFAULT_HEAD_ROTATION());
-            ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(true);
-            ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(true);
+            ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(group.getArmorStandScale().small);
+            ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(group.getArmorStandScale().small);
             armorStand.setInvisible(true);
             ArmorStandHologramElement element = new ArmorStandHologramElement(armorStand, true);
             Vec3d pivot = VectorUtil.toVec3d(group.transform.pivotVec());
-            element.setOffset(pivot.multiply(1/16.0d).multiply(-1, 1, 1));
+            Vec3d base_offset = new Vec3d(0, group.getArmorStandScale().small ? (-0.645) : (-1.4385+0.25), 0); //was +0.171875
+            element.setOffset(base_offset.add(pivot.multiply(1/16.0d).multiply(-1, 1, 1)));
             int id = this.hologram.addElement(element);
-            ModelDisplayPiece displayPiece = new ModelDisplayPiece(armorStand, id, VectorUtil.toVec3d(group.transform.pivotVec()));
+            ModelDisplayPiece displayPiece = new ModelDisplayPiece(armorStand, id, VectorUtil.toVec3d(group.transform.pivotVec()), base_offset, modelPath);
             this.displayPieces.put(group, displayPiece);
         }
 
@@ -127,15 +148,31 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             ArrayList<String> childPaths = getChildPaths(this.parent.base());
             childPaths.forEach(this::setupArmorStand);
 
-            this.hologram.setOffset(new Vec3d(0, -0.4475*2, 0));
+            //this.hologram.setOffset(new Vec3d(0, ServerMobsMod.SMALL_STANDS ? (-0.4475*2) : (-1.4385), 0)); //was -0.4475*2 with baby // do this in individual element to account for different sizes
             this.hologram.show();
+        }
+
+        public static Optional<String> parentPath(String path) {
+            String[] pieces = path.split("\\.");
+            if (pieces.length > 1) {
+                StringBuilder parentPath = new StringBuilder("base");
+                for (int i = 1; i < pieces.length; i++) {
+                    parentPath.append(".").append(pieces[i]);
+                }
+                return Optional.of(parentPath.toString());
+            }
+            return Optional.empty();
         }
 
         public void updateHologram() {
             //this.hologram.addItemStack(this.itemStack, false);
             //this.hologram.setOffset(new Vec3d(0, -1.1865, 0));
             if (this.entity instanceof IServerRenderedEntity serverRenderedEntity) {
-                serverRenderedEntity.setupAngles();
+                if (!this.initializedAngles) {
+                    serverRenderedEntity.initAngles();
+                }
+                serverRenderedEntity.updateAngles();
+                updateParenting(this.parent.base());
             }
             /*this.displayPieces.forEach(((modelGroup, modelDisplayPiece) -> {
                 modelDisplayPiece.armorStand.setInvisible(false);
@@ -149,11 +186,48 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             armorStand.setInvisible(false);*/
         }
 
+        protected void updateParenting(ModelGroup part) {
+            updateParenting(part, null);
+        }
+
+        protected void updateParenting(ModelGroup part, @Nullable ModelGroup parent) {
+            if (parent != null) {
+                String partPath = getPath(part);
+                String parentPath = getPath(parent);
+                if (partPath != null && parentPath != null && getPartParentLocal(partPath)) {
+                    Vec3d defaultPivot = getPartDefaultPivot(partPath);
+                    //ServerMobsMod.LOGGER.info(partPath+": "+defaultPivot);
+                    EulerAngle parentRot = getPartRotation(parentPath);
+
+                    Vec3d rotated = defaultPivot.rotateX((float) Math.toRadians(-parentRot.getWrappedPitch()));
+                    setPartPivot(partPath, rotated);
+
+                    setPartRotation(partPath, getPartRotation(parentPath));
+                }
+            }
+            for (ModelGroup child : part.childGroups) {
+                updateParenting(child, part);
+            }
+        }
+
         /**
          * Marks hologram as dirty, will call position sync
          */
         private void markDirty() {
             this.hologramDirty = true;
+        }
+
+        public void setDamageFlash(boolean damageFlash) {
+            for (String path : getChildPaths(this.parent.base())) {
+                ModelGroup group = getModelGroup(path);
+                if (group != null) {
+                    ModelDisplayPiece piece = this.displayPieces.get(group);
+                    piece.armorStand.equipStack(EquipmentSlot.HEAD, createDisplayStack(group, damageFlash));
+                    if (hologram.getElement(piece.elementID) instanceof ArmorStandHologramElement armorStandHologramElement) {
+                        armorStandHologramElement.markEquipmentDirty();
+                    }
+                }
+            }
         }
 
         public boolean setPartDebug(String path, boolean debug) {
@@ -174,6 +248,26 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 return false;
             }
             return this.displayPieces.get(part).armorStand.isInvisible();
+        }
+
+        public boolean setPartParentLocal(String path, boolean parentLocal) {
+            ModelGroup part = this.getModelGroup(path);
+            if (part == null) {
+                return false;
+            }
+            if (getPartParentLocal(path)!=parentLocal) {
+                this.markDirty();
+            }
+            this.displayPieces.get(part).parentLocalMovement = parentLocal;
+            return true;
+        }
+
+        public boolean getPartParentLocal(String path) {
+            ModelGroup part = this.getModelGroup(path);
+            if (part == null) {
+                return false;
+            }
+            return this.displayPieces.get(part).parentLocalMovement;
         }
 
         public boolean setPartRotation(String path, EulerAngle angle) {
@@ -226,23 +320,41 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             return VectorUtil.toVec3d(part.transform.pivotVec());
         }
 
+        public void defaultDeath() {
+            this.setDamageFlash(true);
+        }
+
         public static class ModelDisplayPiece {
             public final ArmorStandEntity armorStand;
             public final int elementID;
+            public final String path;
+            public final Vec3d base_offset;
             public EulerAngle rotation;
             public Vec3d pivot;
+            public boolean parentLocalMovement;
 
-            public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot) {
+            public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path) {
+                this(armorStand, elementID, pivot, base_offset, path, false);
+            }
+
+            public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path, boolean parentLocalMovement) {
                 this.armorStand = armorStand;
                 this.elementID = elementID;
                 this.rotation = new EulerAngle(0.0f, 0.0f, 0.0f);
                 this.pivot = pivot;
+                this.base_offset = base_offset;
+                this.path = path;
+                this.parentLocalMovement = parentLocalMovement;
             }
 
             public void applyOffset(EntityHologram hologram) {
-                if (hologram.getElement(this.elementID) instanceof ArmorStandHologramElement armorStandHologramElement) {
-                    armorStandHologramElement.setOffset(this.pivot.multiply(1/16.0d).multiply(-1, 1, 1));
+                if (this.getElement(hologram) instanceof ArmorStandHologramElement armorStandHologramElement) {
+                    armorStandHologramElement.setOffset(this.base_offset.add(this.pivot.multiply(1/16.0d).multiply(-1, 1, 1)));
                 }
+            }
+
+            public HologramElement getElement(EntityHologram hologram) {
+                return hologram.getElement(this.elementID);
             }
         }
     }

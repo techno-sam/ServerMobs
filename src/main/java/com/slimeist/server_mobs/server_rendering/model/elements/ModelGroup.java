@@ -2,6 +2,7 @@ package com.slimeist.server_mobs.server_rendering.model.elements;
 
 import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
+import com.slimeist.server_mobs.server_rendering.model.ScaleUtils;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import net.minecraft.util.math.Vec3f;
 
@@ -14,6 +15,7 @@ public class ModelGroup implements IBakedModelPart {
     public final ModelGroup[] childGroups;
     public final ModelBox[] boxes;
     public final String uuid;
+    protected ScaleUtils.Scale standScale = ScaleUtils.Scale.SMALL;
     protected PolymerModelData displayData = null;
 
     public ModelGroup copy() {
@@ -79,5 +81,13 @@ public class ModelGroup implements IBakedModelPart {
 
     public void setDisplayData(PolymerModelData displayData) {
         this.displayData = displayData;
+    }
+
+    public ScaleUtils.Scale getArmorStandScale() {
+        return standScale;
+    }
+
+    public void setArmorStandScale(ScaleUtils.Scale standScale) {
+        this.standScale = standScale;
     }
 }

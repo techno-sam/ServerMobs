@@ -10,5 +10,7 @@ public interface IServerRenderedEntity {
 
     BakedServerEntityModel getBakedModel();
 
-    void setupAngles();
+    void updateAngles();
+
+    default void initAngles() {};
 }

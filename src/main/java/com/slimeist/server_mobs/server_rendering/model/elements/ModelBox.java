@@ -1,6 +1,8 @@
 package com.slimeist.server_mobs.server_rendering.model.elements;
 
 import com.google.gson.*;
+import com.slimeist.server_mobs.ServerMobsMod;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3f;
 
 import java.lang.reflect.Type;
@@ -12,7 +14,10 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
                        ModelUV westUV,
                        ModelUV upUV,
                        ModelUV downUV,
-                       String uuid) implements IBakedModelPart {
+                       String uuid,
+                       Vec3f rotation_origin,
+                       float rotation_amt,
+                       Direction.Axis rotation_axis) implements IBakedModelPart {
 
     @Override
     public String getName() {
@@ -32,6 +37,10 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
         protected String uuid = "";
         protected float inflate = 0;
 
+        protected Vec3f rotation_origin = Vec3f.ZERO;
+        protected float rotation_amt = 0;
+        protected Direction.Axis rotation_axis = Direction.Axis.X;
+
         public Builder() {}
 
         public Builder(ModelBox box) {
@@ -49,6 +58,10 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getName() {
+            return this.name;
         }
 
         public void setFrom(Vec3f from) {
@@ -91,11 +104,23 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
             this.inflate = inflate;
         }
 
+        public void setRotationOrigin(Vec3f origin) {
+            this.rotation_origin = origin;
+        }
+
+        public void setRotationAmount(float amount) {
+            this.rotation_amt = amount;
+        }
+
+        public void setRotationAxis(Direction.Axis axis) {
+            this.rotation_axis = axis;
+        }
+
         public ModelBox build() {
             Vec3f inflateVec = new Vec3f(inflate, inflate, inflate);
             from.subtract(inflateVec);
             to.add(inflateVec);
-            return new ModelBox(name, from, to, northUV, eastUV, southUV, westUV, upUV, downUV, uuid);
+            return new ModelBox(name, from, to, northUV, eastUV, southUV, westUV, upUV, downUV, uuid, rotation_origin, rotation_amt, rotation_axis);
         }
     }
 
@@ -136,17 +161,63 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
                 builder.setUpUV(deserializeFace("up", faces));
                 builder.setDownUV(deserializeFace("down", faces));
             }
+            //Rotation
+            if (object.has("origin")) {
+                JsonArray origin = object.get("origin").getAsJsonArray();
+                if (origin.size() == 3) {
+                    builder.setRotationOrigin(new Vec3f(origin.get(0).getAsFloat(), origin.get(1).getAsFloat(), origin.get(2).getAsFloat()));
+                }
+            }
+            if (object.has("rotation")) {
+                JsonArray rotation = object.get("rotation").getAsJsonArray();
+                if (rotation.size() == 3) {
+                    float x = rotation.get(0).getAsFloat();
+                    float y = rotation.get(1).getAsFloat();
+                    float z = rotation.get(2).getAsFloat();
+
+                    int non_zero = 0;
+                    int index = 0;
+                    float rotation_amt = 0;
+                    Direction.Axis axis = null;
+                    for (float v : new float[]{x, y, z}) {
+                        if (v!=0) {
+                            non_zero++;
+                            rotation_amt = v;
+                            axis = Direction.Axis.values()[index];
+                        }
+                        index++;
+                    }
+
+                    if (non_zero == 1) {
+                        if (rotation_amt==-45f || rotation_amt==-22.5f || rotation_amt==0f || rotation_amt==22.5f || rotation_amt==45f) {
+                            builder.setRotationAmount(rotation_amt);
+                            builder.setRotationAxis(axis);
+                        } else {
+                            ServerMobsMod.LOGGER.error("Loading element with name "+builder.getName()+", rotation "+rotation_amt+" invalid for axis "+axis.getName());
+                        }
+                    } else if (non_zero != 0) {
+                        ServerMobsMod.LOGGER.error("Loading element with name "+builder.getName()+", can only rotate in one axis");
+                    }
+                }
+            }
+
             return builder.build();
         }
 
         private ModelUV deserializeFace(String name, JsonObject parent) {
             if (parent.has(name)) {
                 JsonObject face = parent.getAsJsonObject(name);
+                int rotation = 0;
+                if (face.has("rotation")) {
+                    rotation = face.get("rotation").getAsInt();
+                }
                 if (face.has("uv")) {
                     JsonArray uv = face.getAsJsonArray("uv");
                     if (uv.size() == 4) {
-                        return new ModelUV(uv.get(0).getAsFloat(), uv.get(1).getAsFloat(), uv.get(2).getAsFloat(), uv.get(3).getAsFloat());
+                        return new ModelUV(uv.get(0).getAsFloat(), uv.get(1).getAsFloat(), uv.get(2).getAsFloat(), uv.get(3).getAsFloat(), rotation);
                     }
+                } else {
+                    return new ModelUV(0, 0, 0, 0, rotation);
                 }
             }
             return ModelUV.ZERO;

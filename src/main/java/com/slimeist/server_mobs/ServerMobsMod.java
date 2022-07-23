@@ -3,6 +3,7 @@ package com.slimeist.server_mobs;
 import com.slimeist.server_mobs.entities.GoldGolemEntity;
 import com.slimeist.server_mobs.entities.GustEntity;
 import com.slimeist.server_mobs.entities.MissileEntity;
+import com.slimeist.server_mobs.entities.TestEntity;
 import com.slimeist.server_mobs.items.MissileItem;
 import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
@@ -30,6 +31,8 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "server_mobs";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+	public static final boolean SMALL_STANDS = false;
 
 	//ITEMS
 	public static final Item MISSILE_ITEM = new MissileItem(
@@ -68,6 +71,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());
 	}
 
+	public static EntityType<TestEntity> TEST = Registry.register(
+			Registry.ENTITY_TYPE,
+			id("test"),
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, TestEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
+	);
+	public static ServerEntityModelLoader TEST_LOADER = new ServerEntityModelLoader(TEST);
+	static {
+		TestEntity.setBakedModelSupplier(() -> TEST_LOADER.getBakedModel());
+	}
+
 	@Override
 	public void onInitializeServer() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -90,10 +103,12 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		//Entities
 		FabricDefaultAttributeRegistry.register(GOLD_GOLEM, GoldGolemEntity.createGoldGolemAttributes());
 		FabricDefaultAttributeRegistry.register(GUST, GustEntity.createGustAttributes());
+		FabricDefaultAttributeRegistry.register(TEST, TestEntity.createTestAttributes());
 		//No attributes for missile, it is not a LivingEntity
 		PolymerEntityUtils.registerType(GOLD_GOLEM);
 		PolymerEntityUtils.registerType(GUST);
 		PolymerEntityUtils.registerType(MISSILE);
+		PolymerEntityUtils.registerType(TEST);
 	}
 
 	public static Identifier id(String path) {

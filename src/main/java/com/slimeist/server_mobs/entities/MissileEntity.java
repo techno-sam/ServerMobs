@@ -104,9 +104,13 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     }
 
     @Override
-    public void setupAngles() {
+    public void updateAngles() {
         this.getModelInstance().setPartPivot("base", Vec3d.ZERO);
         this.getModelInstance().setPartRotation("base", new EulerAngle(-this.getPitch(), -this.getYaw(), 0));
+
+        if (!this.isAlive()) {
+            this.getModelInstance().defaultDeath();
+        }
     }
 
     public static void setBakedModelSupplier(Supplier<BakedServerEntityModel> bakedModel) {

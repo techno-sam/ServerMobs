@@ -25,6 +25,7 @@ import java.util.List;
 
 public class ArmorStandHologramElement extends AbstractHologramElement {
     protected final ArmorStandEntity entity;
+    protected boolean equipmentDirty = false;
 
     public ArmorStandHologramElement(ArmorStandEntity entity) {
         this(entity, false);
@@ -58,15 +59,17 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
         accessor.setTrackedValues(data);
 
         player.networkHandler.sendPacket(packet);
-        {
-            ArrayList<Pair<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                equipment.add(Pair.of(slot, this.entity.getEquippedStack(slot)));
-            }
-            EntityEquipmentUpdateS2CPacket armorPacket = new EntityEquipmentUpdateS2CPacket(this.entity.getId(), equipment);
-            player.networkHandler.sendPacket(armorPacket);
-        }
+        updateEquipment(player);
         player.networkHandler.sendPacket(TeamS2CPacket.changePlayerTeam(HologramHelper.getFakeTeam(), this.entity.getUuidAsString(), TeamS2CPacket.Operation.ADD));
+    }
+
+    public void updateEquipment(ServerPlayerEntity player) {
+        ArrayList<Pair<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            equipment.add(Pair.of(slot, this.entity.getEquippedStack(slot)));
+        }
+        EntityEquipmentUpdateS2CPacket armorPacket = new EntityEquipmentUpdateS2CPacket(this.entity.getId(), equipment);
+        player.networkHandler.sendPacket(armorPacket);
     }
 
     @Override
@@ -99,9 +102,17 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
 
             player.networkHandler.sendPacket(packet);
         }
+        if (this.equipmentDirty) {
+            this.updateEquipment(player);
+            this.equipmentDirty = false;
+        }
     }
 
     public void setOffset(Vec3d offset) {
         this.offset = offset;
+    }
+
+    public void markEquipmentDirty() {
+        this.equipmentDirty = true;
     }
 }
