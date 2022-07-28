@@ -71,6 +71,11 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
+
+	exclude "**/*.xcf"
+	exclude "**/*sync-conflict*"
+	exclude "/tools"
+	exclude "**/unused"
 }
 
 // configure the maven publication
