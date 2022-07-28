@@ -59,12 +59,12 @@ public class ScaleUtils {
     }
 
     public static Scale standSize(double scale_amount) {
-        if (scale_amount <= maxScale(Scale.SMALL)) {
+        if (scale_amount <= maxScale(Scale.SMALL) && false) {
             return Scale.SMALL;
         } else if (scale_amount <= maxScale(Scale.BIG)) {
             return Scale.BIG;
         } else {
-            ServerMobsMod.LOGGER.info("IMPOSSIBLE because size "+scale_amount+" exceeds maximum "+maxScale(Scale.BIG));
+            ServerMobsMod.LOGGER.error("IMPOSSIBLE because size "+scale_amount+" exceeds maximum "+maxScale(Scale.BIG));
             return Scale.IMPOSSIBLE;
         }
     }

@@ -1,6 +1,7 @@
 package com.slimeist.server_mobs.server_rendering.model.elements.outline;
 
 import com.google.gson.*;
+import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
 import com.slimeist.server_mobs.server_rendering.model.UnbakedServerEntityModel;
 import com.slimeist.server_mobs.server_rendering.model.elements.ModelBox;
@@ -52,6 +53,7 @@ public record GroupElement(String name,
                 if (array.size() == 3) {
                     origin = new Vec3f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat());
                 }
+                ServerMobsMod.LOGGER.info("Origin of element "+name+" is: "+origin);
             }
             if (object.has("rotation")) {
                 JsonArray array = object.getAsJsonArray("rotation");

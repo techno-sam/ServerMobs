@@ -81,7 +81,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
     @Override
     public void updatePosition(ServerPlayerEntity player, AbstractHologram hologram) {
         Vec3d pos = hologram.getElementPosition(this).add(this.offset);
-        this.entity.setPos(pos.x, pos.y - 0.00, pos.z);
+        this.entity.updatePosition(pos.x, pos.y - 0.00, pos.z);
 
         //this.createRemovePackets(player, hologram);
         //this.createSpawnPackets(player, hologram);

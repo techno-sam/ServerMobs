@@ -22,6 +22,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
+import org.apache.logging.log4j.core.jmx.Server;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -100,11 +102,15 @@ public class ServerEntityModelLoader {
         return tmp;
     }
 
-    private Vec3f max(Vec3f a, Vec3f b) {
+    private Vec3f max(@Nullable Vec3f a, Vec3f b) {
+        if (a==null)
+            a = b;
         return new Vec3f(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ()));
     }
 
-    private Vec3f min(Vec3f a, Vec3f b) {
+    private Vec3f min(@Nullable Vec3f a, Vec3f b) {
+        if (a==null)
+            a = b;
         return new Vec3f(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY()), Math.min(a.getZ(), b.getZ()));
     }
 
@@ -136,22 +142,17 @@ public class ServerEntityModelLoader {
         //Center model around pivot, to disable, set to Vec3f.ZERO
         Vec3f origin = new Vec3f(group.transform.pivotX, group.transform.pivotY, group.transform.pivotZ);
 
-        Vec3f minCoord = new Vec3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
-        Vec3f maxCoord = new Vec3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
+        Vec3f minCoord = null;
+        Vec3f maxCoord = null;
 
+        ServerMobsMod.LOGGER.info(id+", "+model_file_name+" boxes: ");
         for (ModelBox box : group.boxes) {
             Vec3f from = sub(box.from(), origin);
             Vec3f to = sub(box.to(), origin);
-            float[] coords = new float[]{
-                    from.getX(),
-                    from.getY(),
-                    from.getZ(),
-                    to.getX(),
-                    to.getY(),
-                    to.getZ()
-            };
             minCoord = min(minCoord, min(from, to));
             maxCoord = max(maxCoord, max(from, to));
+            ServerMobsMod.LOGGER.info("    "+box.name()+", from: "+from+", to: "+to+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
+
 
             if (!ScaleUtils.standSize(ScaleUtils.scaleAmount(minCoord, maxCoord)).valid) {
                 ServerMobsMod.LOGGER.error("Item model for "+baseLoc+" is too big, try moving pivot point. (The model must not extend beyond -40 or 80 in all axes)");
@@ -161,13 +162,15 @@ public class ServerEntityModelLoader {
         double extra_scaling;
         ScaleUtils.Scale stand_scale;
         // If there were no boxes
-        if (minCoord.getX()==Float.MAX_VALUE || minCoord.getY()==Float.MAX_VALUE || minCoord.getZ()==Float.MAX_VALUE || maxCoord.getX()==Float.MIN_VALUE || maxCoord.getY()==Float.MIN_VALUE || maxCoord.getZ()==Float.MIN_VALUE) {
+        if (minCoord==null || maxCoord==null) {
             extra_scaling = 1;
             stand_scale = ScaleUtils.Scale.SMALL;
+            ServerMobsMod.LOGGER.warn("Defaulting to small because no boxes were found for "+id+", "+model_file_name+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
         } else {
             extra_scaling = ScaleUtils.scaleAmount(minCoord, maxCoord);
             stand_scale = ScaleUtils.standSize(extra_scaling);
         }
+        stand_scale = ScaleUtils.Scale.BIG;
         group.setArmorStandScale(stand_scale);
 
         /*if (divide != 1) {
@@ -207,6 +210,7 @@ public class ServerEntityModelLoader {
             model.add("elements", elements);
             numElements = elements.size();
         }
+        //groups don't seem to do anything
         //groups
         {
             JsonArray groups = new JsonArray();
@@ -216,7 +220,7 @@ public class ServerEntityModelLoader {
                 if (origin.equals(Vec3f.ZERO)) {
                     mainGroup.add("origin", JsonUtil.toJsonArray(Vec3f.ZERO));
                 } else {
-                    mainGroup.add("origin", JsonUtil.toJsonArray(div(group.transform.pivotVec(), extra_scaling)));
+                    mainGroup.add("origin", JsonUtil.toJsonArray(div(origin, extra_scaling)));
                 }
                 {
                     JsonArray childrenArray = new JsonArray();
@@ -239,7 +243,7 @@ public class ServerEntityModelLoader {
                 {
                     JsonArray translation = new JsonArray();
                     translation.add(8*s);
-                    translation.add((8*s) - (4*s));
+                    translation.add((8*s) - (4*ScaleUtils.getScaling(stand_scale)));// - (4*s));
                     translation.add(8*s);
                     head.add("translation", translation);
                 }

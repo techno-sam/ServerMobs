@@ -112,8 +112,8 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             armorStand.setInvisible(true);
             ArmorStandHologramElement element = new ArmorStandHologramElement(armorStand, true);
             Vec3d pivot = VectorUtil.toVec3d(group.transform.pivotVec());
-            Vec3d base_offset = new Vec3d(0, group.getArmorStandScale().small ? (-0.645) : (-1.4385+0.25), 0); //was +0.171875
-            element.setOffset(base_offset.add(pivot.multiply(1/16.0d).multiply(-1, 1, 1)));
+            Vec3d base_offset = new Vec3d(0, group.getArmorStandScale().small ? (-0.645) : (-1.4385), 0); //was +0.171875
+            element.setOffset(base_offset.add(pivot.multiply(1/16.0d).multiply(-1, 1, -1))); //123456789
             int id = this.hologram.addElement(element);
             ModelDisplayPiece displayPiece = new ModelDisplayPiece(armorStand, id, VectorUtil.toVec3d(group.transform.pivotVec()), base_offset, modelPath);
             this.displayPieces.put(group, displayPiece);
@@ -156,7 +156,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             String[] pieces = path.split("\\.");
             if (pieces.length > 1) {
                 StringBuilder parentPath = new StringBuilder("base");
-                for (int i = 1; i < pieces.length; i++) {
+                for (int i = 1; i < pieces.length-1; i++) {
                     parentPath.append(".").append(pieces[i]);
                 }
                 return Optional.of(parentPath.toString());
@@ -170,6 +170,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             if (this.entity instanceof IServerRenderedEntity serverRenderedEntity) {
                 if (!this.initializedAngles) {
                     serverRenderedEntity.initAngles();
+                    this.initializedAngles = true;
                 }
                 serverRenderedEntity.updateAngles();
                 updateParenting(this.parent.base());
@@ -186,6 +187,10 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             armorStand.setInvisible(false);*/
         }
 
+        private static EulerAngle add(EulerAngle a, EulerAngle b) {
+            return new EulerAngle(a.getPitch()+b.getPitch(), a.getYaw()+b.getYaw(), a.getRoll()+b.getRoll());
+        }
+
         protected void updateParenting(ModelGroup part) {
             updateParenting(part, null);
         }
@@ -195,14 +200,25 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 String partPath = getPath(part);
                 String parentPath = getPath(parent);
                 if (partPath != null && parentPath != null && getPartParentLocal(partPath)) {
-                    Vec3d defaultPivot = getPartDefaultPivot(partPath);
-                    //ServerMobsMod.LOGGER.info(partPath+": "+defaultPivot);
-                    EulerAngle parentRot = getPartRotation(parentPath);
+                    ModelDisplayPiece piece = this.displayPieces.get(part);
+                    ModelDisplayPiece parentPiece = this.displayPieces.get(parent);
+                    if (piece.parentRelativePivot != null) {
 
-                    Vec3d rotated = defaultPivot.rotateX((float) Math.toRadians(-parentRot.getWrappedPitch()));
-                    setPartPivot(partPath, rotated);
+                        EulerAngle parentRot = getPartRotation(parentPath);
+                        double x_rad = Math.toRadians(parentRot.getWrappedPitch());
+                        double y_rad = Math.toRadians(-parentRot.getWrappedYaw());
+                        double z_rad = Math.toRadians(-parentRot.getWrappedRoll());
 
-                    setPartRotation(partPath, getPartRotation(parentPath));
+                        /*Vec3d rotatedRelativePivot = piece.parentRelativePivot
+                                .rotateZ(z_rad)
+                                .rotateX(x_rad)
+                                .rotateY(y_rad);*/
+                        Vec3d rotatedRelativePivot = ModelUtil.rotate(piece.parentRelativePivot, x_rad, y_rad, z_rad);
+
+                        setPartPivot(partPath, getPartPivot(parentPath).add(rotatedRelativePivot));
+
+                        setPartRotation(partPath, add(getPartRotation(parentPath), getPartRelativeRotation(partPath)));
+                    }
                 }
             }
             for (ModelGroup child : part.childGroups) {
@@ -258,7 +274,20 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             if (getPartParentLocal(path)!=parentLocal) {
                 this.markDirty();
             }
-            this.displayPieces.get(part).parentLocalMovement = parentLocal;
+            ModelDisplayPiece piece = this.displayPieces.get(part);
+            piece.parentLocalMovement = parentLocal;
+            if (parentLocal) {
+                Optional<String> optionalParentPath = parentPath(path);
+                if (optionalParentPath.isEmpty()) {
+                    throw new IllegalArgumentException("Cannot set parent local to true for a path without a parent");
+                } else {
+//                    ModelGroup parentPart = this.getModelGroup(optionalParentPath.get());
+//                    ModelDisplayPiece parentPiece = this.displayPieces.get(parentPart);
+                    //parent relative pivot   =     my pivot              -                  parent pivot
+                    piece.parentRelativePivot = getPartPivot(path).subtract(getPartPivot(optionalParentPath.get()));
+                    ServerMobsMod.LOGGER.info("set PartParentLocal to "+parentLocal+" for part "+path+", parent: "+optionalParentPath.get()+", pivot: "+getPartDefaultPivot(path)+", parent pivot: "+getPartDefaultPivot(optionalParentPath.get())+", relative pivot: "+piece.parentRelativePivot);
+                }
+            }
             return true;
         }
 
@@ -289,6 +318,26 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 return new EulerAngle(0, 0, 0);
             }
             return this.displayPieces.get(part).rotation;
+        }
+
+        public boolean setPartRelativeRotation(String path, EulerAngle angle) {
+            ModelGroup part = this.getModelGroup(path);
+            if (part == null) {
+                return false;
+            }
+            if (!getPartRelativeRotation(path).equals(angle)) {
+                this.markDirty();
+            }
+            this.displayPieces.get(part).relativeRotation = angle;
+            return true;
+        }
+
+        public EulerAngle getPartRelativeRotation(String path) {
+            ModelGroup part = this.getModelGroup(path);
+            if (part == null) {
+                return new EulerAngle(0, 0, 0);
+            }
+            return this.displayPieces.get(part).relativeRotation;
         }
 
         public boolean setPartPivot(String path, Vec3d pivot) {
@@ -332,24 +381,28 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             public EulerAngle rotation;
             public Vec3d pivot;
             public boolean parentLocalMovement;
+            public Vec3d parentRelativePivot;
+            public EulerAngle relativeRotation;
 
             public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path) {
-                this(armorStand, elementID, pivot, base_offset, path, false);
+                this(armorStand, elementID, pivot, base_offset, path, null,false);
             }
 
-            public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path, boolean parentLocalMovement) {
+            public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path, Vec3d parentRelativePivot, boolean parentLocalMovement) {
                 this.armorStand = armorStand;
                 this.elementID = elementID;
                 this.rotation = new EulerAngle(0.0f, 0.0f, 0.0f);
+                this.relativeRotation = new EulerAngle(0.0f, 0.0f, 0.0f);
                 this.pivot = pivot;
                 this.base_offset = base_offset;
                 this.path = path;
                 this.parentLocalMovement = parentLocalMovement;
+                this.parentRelativePivot = parentRelativePivot;
             }
 
             public void applyOffset(EntityHologram hologram) {
                 if (this.getElement(hologram) instanceof ArmorStandHologramElement armorStandHologramElement) {
-                    armorStandHologramElement.setOffset(this.base_offset.add(this.pivot.multiply(1/16.0d).multiply(-1, 1, 1)));
+                    armorStandHologramElement.setOffset(this.base_offset.add(this.pivot.multiply(1/16.0d).multiply(-1, 1, -1))); //123456789
                 }
             }
 

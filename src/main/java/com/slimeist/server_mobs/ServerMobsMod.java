@@ -1,9 +1,6 @@
 package com.slimeist.server_mobs;
 
-import com.slimeist.server_mobs.entities.GoldGolemEntity;
-import com.slimeist.server_mobs.entities.GustEntity;
-import com.slimeist.server_mobs.entities.MissileEntity;
-import com.slimeist.server_mobs.entities.TestEntity;
+import com.slimeist.server_mobs.entities.*;
 import com.slimeist.server_mobs.items.MissileItem;
 import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
@@ -13,7 +10,6 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -81,6 +77,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		TestEntity.setBakedModelSupplier(() -> TEST_LOADER.getBakedModel());
 	}
 
+	public static EntityType<CrocodileEntity> CROCODILE = Registry.register(
+			Registry.ENTITY_TYPE,
+			id("crocodile"),
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, CrocodileEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
+	);
+	public static ServerEntityModelLoader CROCODILE_LOADER = new ServerEntityModelLoader(CROCODILE);
+	static {
+		CrocodileEntity.setBakedModelSupplier(() -> CROCODILE_LOADER.getBakedModel());
+	}
+
 	@Override
 	public void onInitializeServer() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -104,11 +110,13 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		FabricDefaultAttributeRegistry.register(GOLD_GOLEM, GoldGolemEntity.createGoldGolemAttributes());
 		FabricDefaultAttributeRegistry.register(GUST, GustEntity.createGustAttributes());
 		FabricDefaultAttributeRegistry.register(TEST, TestEntity.createTestAttributes());
+		FabricDefaultAttributeRegistry.register(CROCODILE, CrocodileEntity.createCrocodileAttributes());
 		//No attributes for missile, it is not a LivingEntity
 		PolymerEntityUtils.registerType(GOLD_GOLEM);
 		PolymerEntityUtils.registerType(GUST);
 		PolymerEntityUtils.registerType(MISSILE);
 		PolymerEntityUtils.registerType(TEST);
+		PolymerEntityUtils.registerType(CROCODILE);
 	}
 
 	public static Identifier id(String path) {
