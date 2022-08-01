@@ -1,6 +1,8 @@
 package com.slimeist.server_mobs.server_rendering.hologram;
 
 import com.mojang.datafixers.util.Pair;
+import com.slimeist.server_mobs.ServerMobsMod;
+import eu.pb4.holograms.api.InteractionType;
 import eu.pb4.holograms.api.elements.AbstractHologramElement;
 import eu.pb4.holograms.api.holograms.AbstractHologram;
 import eu.pb4.holograms.mixin.accessors.EntityAccessor;
@@ -8,17 +10,29 @@ import eu.pb4.holograms.mixin.accessors.EntityTrackerUpdateS2CPacketAccessor;
 import eu.pb4.holograms.utils.HologramHelper;
 import eu.pb4.holograms.utils.PacketHelpers;
 import eu.pb4.polymer.mixin.client.item.packet.EntityEquipmentUpdateS2CPacketMixin;
+import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +59,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
     @Override
     public void createSpawnPackets(ServerPlayerEntity player, AbstractHologram hologram) {
         Vec3d pos = hologram.getElementPosition(this).add(this.offset);
-        this.entity.setPos(pos.x, pos.y - 0.00, pos.z);
+        this.entity.requestTeleport(pos.x, pos.y - 0.00, pos.z);
 
         player.networkHandler.sendPacket(this.entity.createSpawnPacket());
 
@@ -81,11 +95,10 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
     @Override
     public void updatePosition(ServerPlayerEntity player, AbstractHologram hologram) {
         Vec3d pos = hologram.getElementPosition(this).add(this.offset);
-        this.entity.updatePosition(pos.x, pos.y - 0.00, pos.z);
+        this.entity.requestTeleport(pos.x, pos.y - 0.00, pos.z);
 
         //this.createRemovePackets(player, hologram);
         //this.createSpawnPackets(player, hologram);
-
         {
             EntityPositionS2CPacket posPacket = new EntityPositionS2CPacket(this.entity);
             player.networkHandler.sendPacket(posPacket);
@@ -102,10 +115,12 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
 
             player.networkHandler.sendPacket(packet);
         }
+
         if (this.equipmentDirty) {
             this.updateEquipment(player);
             this.equipmentDirty = false;
         }
+        //*/
     }
 
     public void setOffset(Vec3d offset) {
@@ -114,5 +129,52 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
 
     public void markEquipmentDirty() {
         this.equipmentDirty = true;
+    }
+
+    //Since this element is intended for use to display a server-side entity, it is helpful to redirect attacks through to the entity beyond
+    @Override
+    public void onClick(AbstractHologram hologram, ServerPlayerEntity player, InteractionType type, @Nullable Hand hand, @Nullable Vec3d vec, int entityId) {
+        float d = player.interactionManager.getGameMode().isCreative() ? 6.0f : 4.5f;
+        Vec3d camPos = player.getCameraPosVec(0.5f);
+        Vec3d rot = player.getRotationVec(1.0f);
+        Vec3d endPos = camPos.add(rot.x * d, rot.y * d, rot.z * d);
+        Box box = player.getBoundingBox().stretch(rot.multiply(d)).expand(1.0, 1.0, 1.0);
+        EntityHitResult hitResult = ProjectileUtil.raycast(player, camPos, endPos, box, entity -> !entity.isSpectator() && entity.collides(), d * d);
+
+        switch (type) {
+            case ATTACK:
+                if (hitResult != null) {
+                    //ServerMobsMod.LOGGER.info("Player "+player.getName().getString()+" hit entity "+hitResult.getEntity().getEntityName());
+                    player.attack(hitResult.getEntity());
+                }
+                break;
+            case INTERACT:
+                if (hitResult != null) {
+                    if (vec != null) {
+                        processInteract(player, hand, hitResult.getEntity(), (p, e, h) -> e.interactAt(p, vec, h));
+                    } else {
+                        processInteract(player, hand, hitResult.getEntity(), PlayerEntity::interact);
+                    }
+                }
+                break;
+            default:
+                super.onClick(hologram, player, type, hand, vec, entityId);
+        }
+    }
+
+    private void processInteract(ServerPlayerEntity player, Hand hand, Entity entity, Interaction action) {
+        ItemStack itemStack = player.getStackInHand(hand).copy();
+        ActionResult actionResult = action.run(player, entity, hand);
+        if (actionResult.isAccepted()) {
+            Criteria.PLAYER_INTERACTED_WITH_ENTITY.trigger(player, itemStack, entity);
+            if (actionResult.shouldSwingHand()) {
+                player.swingHand(hand, true);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    interface Interaction {
+        ActionResult run(ServerPlayerEntity var1, Entity var2, Hand var3);
     }
 }

@@ -13,4 +13,8 @@ public interface IServerRenderedEntity {
     void updateAngles();
 
     default void initAngles() {};
+
+    default String getNametagPath() {
+        return "base";
+    }
 }

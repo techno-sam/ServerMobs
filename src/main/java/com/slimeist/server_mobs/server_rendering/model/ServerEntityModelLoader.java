@@ -40,16 +40,27 @@ Strategy:
  */
 public class ServerEntityModelLoader {
     public final EntityType<?> entityType;
+    public final boolean doDamageTint;
     protected UnbakedServerEntityModel unbakedModel = null;
     protected BakedServerEntityModel bakedModel = null;
+    private boolean forceMarker = false;
     private final String model_name_override;
 
     public ServerEntityModelLoader(EntityType<?> entityType) {
         this(entityType, null);
     }
 
+    public ServerEntityModelLoader(EntityType<?> entityType, boolean doDamageTint) {
+        this(entityType, null, doDamageTint);
+    }
+
     public ServerEntityModelLoader(EntityType<?> entityType, String model_name_override) {
+        this(entityType, model_name_override, true);
+    }
+
+    public ServerEntityModelLoader(EntityType<?> entityType, String model_name_override, boolean doDamageTint) {
         this.entityType = entityType;
+        this.doDamageTint = doDamageTint;
         if (model_name_override!=null) {
             model_name_override = model_name_override.replace("..", "");
         }
@@ -57,21 +68,36 @@ public class ServerEntityModelLoader {
         PolymerRPUtils.RESOURCE_PACK_CREATION_EVENT.register(this::loadRP);
     }
 
+    public ServerEntityModelLoader forceMarker() {
+        this.forceMarker = true;
+        return this;
+    }
+
+    public ServerEntityModelLoader unforceMarker() {
+        this.forceMarker = false;
+        return this;
+    }
+
     private void loadRP(PolymerRPBuilder builder) {
         Identifier id = Registry.ENTITY_TYPE.getId(entityType);
         String texture_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + id.getPath() + ".png";
+        String texture_tint_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + id.getPath() + "_tint.png";
         String model_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + (this.model_name_override==null ? id.getPath() + ".bbmodel" : this.model_name_override);
         String texture_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + ".png";
+        String texture_tint_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + "_tint.png";
         String model_loc_out = "assets/" + id.getNamespace() + "/models/entity/" + id.getPath() + "/";
 
         builder.copyModAssets(ServerMobsMod.MOD_ID);
 
         //copy texture
         builder.addData(texture_loc_out, builder.getData(texture_loc_in));
+        if (this.doDamageTint) {
+            builder.addData(texture_tint_loc_out, builder.getData(texture_tint_loc_in));
+        }
         //load model
         String model_contents = new String(builder.getData(model_loc_in));
         this.unbakedModel = UnbakedServerEntityModel.deserialize(model_contents);
-        this.bakedModel = this.unbakedModel.bake();
+        this.bakedModel = this.unbakedModel.bake(forceMarker);
         ModelBox hitbox = this.bakedModel.base().getChild("hitbox").boxes[0];
         Vec3f hitboxSize = hitbox.to().copy();
         hitboxSize.subtract(hitbox.from());
@@ -121,6 +147,7 @@ public class ServerEntityModelLoader {
             createItemModel(builder, baseLoc, child);
         }
         String model_file_name = baseLoc + "model.json";
+        String tint_model_file_name = baseLoc + "model_tint.json";
         JsonObject model = new JsonObject();
         //parent
         // model.addProperty("parent", "minecraft:block/block");
@@ -133,25 +160,19 @@ public class ServerEntityModelLoader {
             size_array.add(this.bakedModel.texHeight());
             model.add("texture_size", size_array);
         }
-        //textures
-        {
-            JsonObject textures = new JsonObject();
-            textures.addProperty("0", id.getNamespace() + ":entity/" + id.getPath());
-            model.add("textures", textures);
-        }
         //Center model around pivot, to disable, set to Vec3f.ZERO
         Vec3f origin = new Vec3f(group.transform.pivotX, group.transform.pivotY, group.transform.pivotZ);
 
         Vec3f minCoord = null;
         Vec3f maxCoord = null;
 
-        ServerMobsMod.LOGGER.info(id+", "+model_file_name+" boxes: ");
+        //ServerMobsMod.LOGGER.info(id+", "+model_file_name+" boxes: ");
         for (ModelBox box : group.boxes) {
             Vec3f from = sub(box.from(), origin);
             Vec3f to = sub(box.to(), origin);
             minCoord = min(minCoord, min(from, to));
             maxCoord = max(maxCoord, max(from, to));
-            ServerMobsMod.LOGGER.info("    "+box.name()+", from: "+from+", to: "+to+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
+            //ServerMobsMod.LOGGER.info("    "+box.name()+", from: "+from+", to: "+to+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
 
 
             if (!ScaleUtils.standSize(ScaleUtils.scaleAmount(minCoord, maxCoord)).valid) {
@@ -165,7 +186,7 @@ public class ServerEntityModelLoader {
         if (minCoord==null || maxCoord==null) {
             extra_scaling = 1;
             stand_scale = ScaleUtils.Scale.SMALL;
-            ServerMobsMod.LOGGER.warn("Defaulting to small because no boxes were found for "+id+", "+model_file_name+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
+            //ServerMobsMod.LOGGER.warn("Defaulting to small because no boxes were found for "+id+", "+model_file_name+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
         } else {
             extra_scaling = ScaleUtils.scaleAmount(minCoord, maxCoord);
             stand_scale = ScaleUtils.standSize(extra_scaling);
@@ -258,6 +279,18 @@ public class ServerEntityModelLoader {
             }
             model.add("display", display);
         }
+        JsonObject tint_model = model.deepCopy();
+        //textures
+        {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("0", id.getNamespace() + ":entity/" + id.getPath());
+            model.add("textures", textures);
+        }
+        if (this.doDamageTint) {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("0", id.getNamespace() + ":entity/" + id.getPath()+"_tint");
+            tint_model.add("textures", textures);
+        }
 
         ///////////
         // BUILD //
@@ -266,7 +299,7 @@ public class ServerEntityModelLoader {
         String model_string = GSON.toJson(model);
         builder.addData(model_file_name, model_string.getBytes(StandardCharsets.UTF_8));
         PolymerModelData polymerModelData = PolymerRPUtils.requestModel(
-                Items.LEATHER_HORSE_ARMOR,
+                Items.CARVED_PUMPKIN,
                 new Identifier(
                         id.getNamespace(),
                         model_file_name
@@ -275,6 +308,21 @@ public class ServerEntityModelLoader {
                 )
         );
         group.setDisplayData(polymerModelData);
+
+        if (this.doDamageTint) {
+            String tint_model_string = GSON.toJson(tint_model);
+            builder.addData(tint_model_file_name, tint_model_string.getBytes(StandardCharsets.UTF_8));
+            PolymerModelData tintPolymerModelData = PolymerRPUtils.requestModel(
+                    Items.CARVED_PUMPKIN,
+                    new Identifier(
+                            id.getNamespace(),
+                            tint_model_file_name
+                                    .replace("assets/" + id.getNamespace() + "/models/", "")
+                                    .replace(".json", "")
+                    )
+            );
+            group.setTintDisplayData(tintPolymerModelData);
+        }
     }
 
     private JsonObject createFace(ModelUV uv) {

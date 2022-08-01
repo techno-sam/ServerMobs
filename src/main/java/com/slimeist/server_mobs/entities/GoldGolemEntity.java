@@ -167,11 +167,7 @@ public class GoldGolemEntity extends GolemEntity implements PolymerEntity, Range
         this.getModelInstance().setPartRotation("base.body.right_hand", new EulerAngle(0, this.bodyYaw+((this.headYaw - this.bodyYaw)*0.25f), 0));
         this.getModelInstance().setPartRotation("base.body_bottom", new EulerAngle(0, this.bodyYaw, 0));
 
-        if (!this.isAlive()) {
-            this.getModelInstance().defaultDeath();
-        } else {
-            this.getModelInstance().setDamageFlash(this.hurtTime>0);
-        }
+        this.getModelInstance().handleDamageFlash(this);
     }
 
     public static void setBakedModelSupplier(Supplier<BakedServerEntityModel> bakedModel) {

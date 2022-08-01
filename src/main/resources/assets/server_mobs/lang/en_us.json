@@ -4,6 +4,8 @@
   "entity.server_mobs.gust": "Gust",
   "entity.server_mobs.gold_golem": "Gold Golem",
   "entity.server_mobs.missile": "Missile",
+  "entity.server_mobs.test": "Test Mob",
+  "entity.server_mobs.crocodile": "Crocodile",
 
   "server_mobs.tooltip.missile": "Point at target to lock target, then use to fire.",
   "server_mobs.missile.target_locked": "\u00A7aTarget Locked\u00A7r",

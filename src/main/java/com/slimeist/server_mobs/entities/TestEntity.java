@@ -143,11 +143,7 @@ public class TestEntity extends GolemEntity implements PolymerEntity, RangedAtta
         this.getModelInstance().setPartRotation("base.main", new EulerAngle(rot, 0, 0));
         this.getModelInstance().setPartRelativeRotation("base.main.oversize", new EulerAngle(0, rot, 0));
 
-        if (!this.isAlive()) {
-            this.getModelInstance().defaultDeath();
-        } else {
-            this.getModelInstance().setDamageFlash(this.hurtTime>0);
-        }
+        this.getModelInstance().handleDamageFlash(this);
     }
 
     @Override

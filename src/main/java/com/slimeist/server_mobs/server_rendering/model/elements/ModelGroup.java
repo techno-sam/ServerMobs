@@ -5,6 +5,7 @@ import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
 import com.slimeist.server_mobs.server_rendering.model.ScaleUtils;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import net.minecraft.util.math.Vec3f;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +18,13 @@ public class ModelGroup implements IBakedModelPart {
     public final String uuid;
     protected ScaleUtils.Scale standScale = ScaleUtils.Scale.SMALL;
     protected PolymerModelData displayData = null;
+    protected PolymerModelData tintDisplayData = null;
 
     public ModelGroup copy() {
-        return new ModelGroup(name, transform, childGroups, boxes, uuid, displayData);
+        return new ModelGroup(name, transform, childGroups, boxes, uuid, displayData, tintDisplayData);
     }
 
-    protected ModelGroup(String name, ModelTransform transform, ModelGroup[] childGroups, ModelBox[] boxes, String uuid, PolymerModelData displayData) {
+    protected ModelGroup(String name, ModelTransform transform, ModelGroup[] childGroups, ModelBox[] boxes, String uuid, PolymerModelData displayData, @Nullable PolymerModelData tintDisplayData) {
         this.name = name;
         this.transform = transform;
         this.childGroups = childGroups;
@@ -76,11 +78,27 @@ public class ModelGroup implements IBakedModelPart {
     }
 
     public PolymerModelData getDisplayData() {
-        return displayData;
+        return getDisplayData(false);
+    }
+
+    public PolymerModelData getDisplayData(boolean damageTint) {
+        return (doesDamageTint() && damageTint) ? tintDisplayData : displayData;
+    }
+
+    public boolean doesDamageTint() {
+        return tintDisplayData != null;
+    }
+
+    public PolymerModelData getTintDisplayData() {
+        return tintDisplayData;
     }
 
     public void setDisplayData(PolymerModelData displayData) {
         this.displayData = displayData;
+    }
+
+    public void setTintDisplayData(@Nullable PolymerModelData tintDisplayData) {
+        this.tintDisplayData = tintDisplayData;
     }
 
     public ScaleUtils.Scale getArmorStandScale() {

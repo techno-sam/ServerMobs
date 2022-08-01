@@ -11,28 +11,29 @@ import eu.pb4.holograms.api.holograms.EntityHologram;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-//TODO (Includes GoldGolemEntity), make transforms propogate down to child elements (THIS IS GOING TO BE A LOT OF WORK)
 public record BakedServerEntityModel(int texWidth, int texHeight,
-                                     ModelGroup base) {
+                                     ModelGroup base, boolean forceMarker) {
 
     public <T extends Entity & IServerRenderedEntity> Instance createInstance(T entity) {
         return new Instance(this, entity);
     }
 
     public static class Instance {
-        private BakedServerEntityModel parent;
-        private Entity entity;
-        private EntityHologram hologram;
-        private HashMap<ModelGroup, ModelDisplayPiece> displayPieces;
+        private final BakedServerEntityModel parent;
+        private final Entity entity;
+        private final EntityHologram hologram;
+        private final HashMap<ModelGroup, ModelDisplayPiece> displayPieces;
         private boolean hologramDirty;
         private boolean initializedAngles = false;
 
@@ -71,17 +72,17 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         }
 
         private ItemStack createDisplayStack(ModelGroup group, boolean damageFlash) {
-            PolymerModelData data = group.getDisplayData();
+            PolymerModelData data = group.getDisplayData(damageFlash);
             ItemStack displayStack = new ItemStack(data.item(), 1);
             NbtCompound nbt = displayStack.getOrCreateNbt();
 
             nbt.putInt("CustomModelData", data.value());
 
-            {
+            /*{
                 NbtCompound display = new NbtCompound();
                 display.putInt("color", damageFlash ? 0xFF9595 : -1); //-1 is white
                 nbt.put("display", display);
-            }
+            }*/
 
             displayStack.setNbt(nbt);
             return displayStack;
@@ -107,7 +108,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             armorStand.setHeadYaw(0.0f);
             armorStand.setBodyRotation(ArmorStandEntityAccessor.getDEFAULT_BODY_ROTATION());
             armorStand.setHeadRotation(ArmorStandEntityAccessor.getDEFAULT_HEAD_ROTATION());
-            ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(group.getArmorStandScale().small);
+            ((ArmorStandEntityAccessor) armorStand).invokeSetMarker(group.getArmorStandScale().small || parent.forceMarker);
             ((ArmorStandEntityAccessor) armorStand).invokeSetSmall(group.getArmorStandScale().small);
             armorStand.setInvisible(true);
             ArmorStandHologramElement element = new ArmorStandHologramElement(armorStand, true);
@@ -174,6 +175,17 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 }
                 serverRenderedEntity.updateAngles();
                 updateParenting(this.parent.base());
+
+                String nametagPath = serverRenderedEntity.getNametagPath();
+                this.displayPieces.forEach((group, display) -> {
+                    if (display.path.equals(nametagPath)) {
+                        display.armorStand.setCustomName(this.entity.getDisplayName());
+                        display.armorStand.setCustomNameVisible(this.entity.hasCustomName());
+                    } else {
+                        display.armorStand.setCustomName(LiteralText.EMPTY);
+                        display.armorStand.setCustomNameVisible(false);
+                    }
+                });
             }
             /*this.displayPieces.forEach(((modelGroup, modelDisplayPiece) -> {
                 modelDisplayPiece.armorStand.setInvisible(false);
@@ -234,11 +246,15 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         }
 
         public void setDamageFlash(boolean damageFlash) {
+            setDamageFlash(damageFlash, false);
+        }
+
+        public void setDamageFlash(boolean damageFlash, boolean invisible) {
             for (String path : getChildPaths(this.parent.base())) {
                 ModelGroup group = getModelGroup(path);
                 if (group != null) {
                     ModelDisplayPiece piece = this.displayPieces.get(group);
-                    piece.armorStand.equipStack(EquipmentSlot.HEAD, createDisplayStack(group, damageFlash));
+                    piece.armorStand.equipStack(EquipmentSlot.HEAD, invisible ? ItemStack.EMPTY : createDisplayStack(group, damageFlash));
                     if (hologram.getElement(piece.elementID) instanceof ArmorStandHologramElement armorStandHologramElement) {
                         armorStandHologramElement.markEquipmentDirty();
                     }
@@ -285,7 +301,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
 //                    ModelDisplayPiece parentPiece = this.displayPieces.get(parentPart);
                     //parent relative pivot   =     my pivot              -                  parent pivot
                     piece.parentRelativePivot = getPartPivot(path).subtract(getPartPivot(optionalParentPath.get()));
-                    ServerMobsMod.LOGGER.info("set PartParentLocal to "+parentLocal+" for part "+path+", parent: "+optionalParentPath.get()+", pivot: "+getPartDefaultPivot(path)+", parent pivot: "+getPartDefaultPivot(optionalParentPath.get())+", relative pivot: "+piece.parentRelativePivot);
+                    //ServerMobsMod.LOGGER.info("set PartParentLocal to "+parentLocal+" for part "+path+", parent: "+optionalParentPath.get()+", pivot: "+getPartDefaultPivot(path)+", parent pivot: "+getPartDefaultPivot(optionalParentPath.get())+", relative pivot: "+piece.parentRelativePivot);
                 }
             }
             return true;
@@ -369,8 +385,13 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             return VectorUtil.toVec3d(part.transform.pivotVec());
         }
 
-        public void defaultDeath() {
-            this.setDamageFlash(true);
+        public <L extends LivingEntity> void handleDamageFlash(L livingEntity) {
+            boolean invisible = livingEntity.isInvisible();
+            if (!livingEntity.isAlive()) {
+                this.setDamageFlash(true, invisible);
+            } else {
+                this.setDamageFlash(livingEntity.hurtTime>0, invisible);
+            }
         }
 
         public static class ModelDisplayPiece {

@@ -71,11 +71,7 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
         }
         this.getModelInstance().setPartRotation("base.bottom_spin", new EulerAngle(0, (360*(this.age/(20*1.25f)))%360, 0));
 
-        if (!this.isAlive()) {
-            this.getModelInstance().defaultDeath();
-        } else {
-            this.getModelInstance().setDamageFlash(this.hurtTime>0);
-        }
+        this.getModelInstance().handleDamageFlash(this);
     }
 
     public static void setBakedModelSupplier(Supplier<BakedServerEntityModel> bakedModel) {

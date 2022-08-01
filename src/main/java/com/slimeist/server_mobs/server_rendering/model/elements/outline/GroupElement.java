@@ -53,7 +53,7 @@ public record GroupElement(String name,
                 if (array.size() == 3) {
                     origin = new Vec3f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat());
                 }
-                ServerMobsMod.LOGGER.info("Origin of element "+name+" is: "+origin);
+                //ServerMobsMod.LOGGER.info("Origin of element "+name+" is: "+origin);
             }
             if (object.has("rotation")) {
                 JsonArray array = object.getAsJsonArray("rotation");

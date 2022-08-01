@@ -59,7 +59,7 @@ public class ScaleUtils {
     }
 
     public static Scale standSize(double scale_amount) {
-        if (scale_amount <= maxScale(Scale.SMALL) && false) {
+        if (scale_amount <= maxScale(Scale.SMALL)) {
             return Scale.SMALL;
         } else if (scale_amount <= maxScale(Scale.BIG)) {
             return Scale.BIG;

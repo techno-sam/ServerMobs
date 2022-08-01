@@ -109,7 +109,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
         this.getModelInstance().setPartRotation("base", new EulerAngle(-this.getPitch(), -this.getYaw(), 0));
 
         if (!this.isAlive()) {
-            this.getModelInstance().defaultDeath();
+            this.getModelInstance().setDamageFlash(true);
         }
     }
 

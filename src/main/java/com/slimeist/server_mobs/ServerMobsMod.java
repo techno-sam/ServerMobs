@@ -7,6 +7,7 @@ import eu.pb4.polymer.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -18,6 +19,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +29,6 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "server_mobs";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
-	public static final boolean SMALL_STANDS = false;
 
 	//ITEMS
 	public static final Item MISSILE_ITEM = new MissileItem(
@@ -43,6 +43,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, GoldGolemEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
 	);
 	public static ServerEntityModelLoader GOLD_GOLEM_LOADER = new ServerEntityModelLoader(GOLD_GOLEM);
+
 	static {
 		GoldGolemEntity.setBakedModelSupplier(() -> GOLD_GOLEM_LOADER.getBakedModel());
 	}
@@ -53,6 +54,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, GustEntity::new).dimensions(EntityDimensions.fixed(0.875f, 1.5f)).trackRangeChunks(8).build()
 	);
 	public static ServerEntityModelLoader GUST_LOADER = new ServerEntityModelLoader(GUST);
+
 	static {
 		GustEntity.setBakedModelSupplier(() -> GUST_LOADER.getBakedModel());
 	}
@@ -63,7 +65,8 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, MissileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackRangeChunks(8).build()
 	);
 	public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_entity.bbmodel");
-	static  {
+
+	static {
 		MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());
 	}
 
@@ -73,6 +76,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, TestEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
 	);
 	public static ServerEntityModelLoader TEST_LOADER = new ServerEntityModelLoader(TEST);
+
 	static {
 		TestEntity.setBakedModelSupplier(() -> TEST_LOADER.getBakedModel());
 	}
@@ -80,9 +84,10 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	public static EntityType<CrocodileEntity> CROCODILE = Registry.register(
 			Registry.ENTITY_TYPE,
 			id("crocodile"),
-			FabricEntityTypeBuilder.create(SpawnGroup.MISC, CrocodileEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
+			FabricEntityTypeBuilder.<CrocodileEntity>create(SpawnGroup.MONSTER, CrocodileEntity::new).dimensions(EntityDimensions.fixed(1.1875f, 0.75f)).trackRangeChunks(8).build()
 	);
 	public static ServerEntityModelLoader CROCODILE_LOADER = new ServerEntityModelLoader(CROCODILE);
+
 	static {
 		CrocodileEntity.setBakedModelSupplier(() -> CROCODILE_LOADER.getBakedModel());
 	}
@@ -117,6 +122,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		PolymerEntityUtils.registerType(MISSILE);
 		PolymerEntityUtils.registerType(TEST);
 		PolymerEntityUtils.registerType(CROCODILE);
+
+		CrocodileEntity.registerSpawnRestrictions(CROCODILE);
+		BiomeModifications.addSpawn(
+				biomeSelectionContext -> Biome.getCategory(biomeSelectionContext.getBiomeRegistryEntry()).equals(Biome.Category.SWAMP),
+				CROCODILE.getSpawnGroup(),
+				CROCODILE,
+				12,
+				2,
+				4
+		);
 	}
 
 	public static Identifier id(String path) {
