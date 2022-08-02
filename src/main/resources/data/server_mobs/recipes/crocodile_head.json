@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "HnH",
+    ", ,"
+  ],
+  "key": {
+    "H": {
+      "item": "server_mobs:crocodile_hide"
+    },
+    "n": {
+      "item": "server_mobs:crocodile_hide_helmet"
+    },
+    ",": {
+      "item": "server_mobs:crocodile_tooth"
+    }
+  },
+  "result": {
+    "item": "server_mobs:crocodile_head"
+  }
+}

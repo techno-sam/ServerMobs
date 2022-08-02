@@ -1,9 +1,12 @@
 package com.slimeist.server_mobs;
 
 import com.slimeist.server_mobs.entities.*;
-import com.slimeist.server_mobs.items.MissileItem;
+import com.slimeist.server_mobs.items.*;
 import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
+import eu.pb4.polymer.api.item.PolymerItem;
+import eu.pb4.polymer.api.item.SimplePolymerItem;
+import eu.pb4.polymer.api.resourcepack.PolymerArmorModel;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -14,12 +17,11 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +33,20 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	//ITEMS
-	public static final Item MISSILE_ITEM = new MissileItem(
+	public static final MissileItem MISSILE_ITEM = new MissileItem(
 			new FabricItemSettings()
 					.group(ItemGroup.COMBAT),
 			Items.BLAZE_ROD);
+
+	public static final SimpleCustomModelItem CROCODILE_HIDE_ITEM = new SimpleCustomModelItem(
+			new FabricItemSettings()
+					.group(ItemGroup.MATERIALS),
+			Items.LEATHER);
+
+	public static final SimpleCustomModelItem CROCODILE_TOOTH_ITEM = new SimpleCustomModelItem(
+			new FabricItemSettings()
+					.group(ItemGroup.MATERIALS),
+			Items.BONE);
 
 	//ENTITIES
 	public static EntityType<GoldGolemEntity> GOLD_GOLEM = Registry.register(
@@ -92,6 +104,25 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		CrocodileEntity.setBakedModelSupplier(() -> CROCODILE_LOADER.getBakedModel());
 	}
 
+	public static final CustomPolymerSpawnEggItem CROCODILE_SPAWN_EGG = new CustomPolymerSpawnEggItem(CROCODILE, Items.GHAST_SPAWN_EGG, new FabricItemSettings().group(ItemGroup.MISC));
+
+	private static <I extends Item & PolymerItem & CustomModelItem> void registerCustomModelItem(I item, String name) {
+		PolymerModelData data = PolymerRPUtils.requestModel(item.getPolymerItem(new ItemStack(item, 1), null), id("item/"+name));
+		item.setCustomModelData(data.value());
+		Registry.register(Registry.ITEM, id(name), item);
+	}
+
+	//ARMOR
+	private static CustomArmorItem crocodileArmor(Item armorBase) {
+		return new CustomArmorItem((ArmorItem) armorBase, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT));
+	}
+
+	public static final CustomArmorItem CROCODILE_HEAD = new CustomArmorItem((ArmorItem) Items.LEATHER_HELMET, Items.SLIME_BALL, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT));
+	public static final CustomArmorItem CROCODILE_HIDE_HELMET = crocodileArmor(Items.LEATHER_HELMET);
+	public static final CustomArmorItem CROCODILE_HIDE_CHESTPLATE = crocodileArmor(Items.LEATHER_CHESTPLATE);
+	public static final CustomArmorItem CROCODILE_HIDE_LEGGINGS = crocodileArmor(Items.LEATHER_LEGGINGS);
+	public static final CustomArmorItem CROCODILE_HIDE_BOOTS = crocodileArmor(Items.LEATHER_BOOTS);
+
 	@Override
 	public void onInitializeServer() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -107,9 +138,22 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		}
 		PolymerRPUtils.markAsRequired();
 		//Items
-		PolymerModelData missileData = PolymerRPUtils.requestModel(Items.BLAZE_ROD, id("item/missile_item"));
-		((MissileItem) MISSILE_ITEM).setCustomModelData(missileData.value());
-		Registry.register(Registry.ITEM, id("missile"), MISSILE_ITEM);
+		registerCustomModelItem(MISSILE_ITEM, "missile");
+		registerCustomModelItem(CROCODILE_HIDE_ITEM, "crocodile_hide");
+		registerCustomModelItem(CROCODILE_TOOTH_ITEM, "crocodile_tooth");
+		registerCustomModelItem(CROCODILE_SPAWN_EGG, "crocodile_spawn_egg");
+
+		registerCustomModelItem(CROCODILE_HEAD, "crocodile_head");
+		registerCustomModelItem(CROCODILE_HIDE_HELMET, "crocodile_hide_helmet");
+		registerCustomModelItem(CROCODILE_HIDE_CHESTPLATE, "crocodile_hide_chestplate");
+		registerCustomModelItem(CROCODILE_HIDE_LEGGINGS, "crocodile_hide_leggings");
+		registerCustomModelItem(CROCODILE_HIDE_BOOTS, "crocodile_hide_boots");
+
+		PolymerArmorModel crocodileArmorModel = PolymerRPUtils.requestArmor(id("crocodile_hide"));
+		CROCODILE_HIDE_HELMET.setCustomArmorColor(crocodileArmorModel.value());
+		CROCODILE_HIDE_CHESTPLATE.setCustomArmorColor(crocodileArmorModel.value());
+		CROCODILE_HIDE_LEGGINGS.setCustomArmorColor(crocodileArmorModel.value());
+		CROCODILE_HIDE_BOOTS.setCustomArmorColor(crocodileArmorModel.value());
 
 		//Entities
 		FabricDefaultAttributeRegistry.register(GOLD_GOLEM, GoldGolemEntity.createGoldGolemAttributes());

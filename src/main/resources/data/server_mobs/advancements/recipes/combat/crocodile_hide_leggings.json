@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "server_mobs:crocodile_hide_leggings"
+    ]
+  },
+  "criteria": {
+    "has_crocodile_hide": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "server_mobs:crocodile_hide"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "server_mobs:crocodile_hide_leggings"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_crocodile_hide",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    ",",
+    "I"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:bamboo"
+    },
+    ",": {
+      "item": "server_mobs:crocodile_tooth"
+    }
+  },
+  "result": {
+    "item": "server_mobs:crocodile_flute"
+  }
+}

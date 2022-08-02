@@ -1,5 +1,13 @@
 {
   "item.server_mobs.missile": "Missile",
+  "item.server_mobs.crocodile_spawn_egg": "Crocodile Spawn Egg",
+  "item.server_mobs.crocodile_head": "Crocodile Head",
+  "item.server_mobs.crocodile_hide_helmet": "Crocodile Hide Helmet",
+  "item.server_mobs.crocodile_hide_chestplate": "Crocodile Hide Chestplate",
+  "item.server_mobs.crocodile_hide_leggings": "Crocodile Hide Leggings",
+  "item.server_mobs.crocodile_hide_boots": "Crocodile Hide Boots",
+  "item.server_mobs.crocodile_hide": "Crocodile Hide",
+  "item.server_mobs.crocodile_tooth": "Crocodile Tooth",
 
   "entity.server_mobs.gust": "Gust",
   "entity.server_mobs.gold_golem": "Gold Golem",

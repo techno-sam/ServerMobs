@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "server_mobs:item/crocodile_hide_leggings"
+	}
+}

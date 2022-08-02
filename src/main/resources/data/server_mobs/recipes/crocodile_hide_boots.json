@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "X X",
+    "X X"
+  ],
+  "key": {
+    "X": {
+      "item": "server_mobs:crocodile_hide"
+    }
+  },
+  "result": {
+    "item": "server_mobs:crocodile_hide_boots"
+  }
+}

@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MissileItem extends SimplePolymerItem {
+public class MissileItem extends SimplePolymerItem implements CustomModelItem {
     private int customModelData;
     public MissileItem(Settings settings, Item polymerItem) {
         this(settings, polymerItem, -1);

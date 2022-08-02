@@ -355,6 +355,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("chompTicks", this.chompTicks);
         nbt.putInt("stunTicks", this.stunTicks);
+        nbt.putDouble("mouthAngleFactor", this.mouthAngleFactor);
     }
 
     @Override
@@ -365,6 +366,9 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         }
         if (nbt.contains("stunTicks", NbtCompound.INT_TYPE)) {
             this.stunTicks = nbt.getInt("stunTicks");
+        }
+        if (nbt.contains("mouthAngleFactor", NbtCompound.DOUBLE_TYPE)) {
+            this.mouthAngleFactor = nbt.getInt("mouthAngleFactor");
         }
     }
 
