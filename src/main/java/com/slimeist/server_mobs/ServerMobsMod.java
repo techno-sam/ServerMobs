@@ -76,7 +76,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			id("missile"),
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, MissileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackRangeChunks(8).build()
 	);
-	public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_entity.bbmodel");
+	public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_entity.bbmodel", false);
 
 	static {
 		MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());

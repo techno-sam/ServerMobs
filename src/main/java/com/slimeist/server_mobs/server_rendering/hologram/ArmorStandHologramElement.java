@@ -32,6 +32,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -141,6 +142,8 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
         Box box = player.getBoundingBox().stretch(rot.multiply(d)).expand(1.0, 1.0, 1.0);
         EntityHitResult hitResult = ProjectileUtil.raycast(player, camPos, endPos, box, entity -> !entity.isSpectator() && entity.collides(), d * d);
 
+        //ServerMobsMod.LOGGER.info("onClick: type = "+type);
+
         switch (type) {
             case ATTACK:
                 if (hitResult != null) {
@@ -149,10 +152,14 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
                 }
                 break;
             case INTERACT:
+                //ServerMobsMod.LOGGER.info("INTERACT");
                 if (hitResult != null) {
-                    if (vec != null) {
-                        processInteract(player, hand, hitResult.getEntity(), (p, e, h) -> e.interactAt(p, vec, h));
+                    //ServerMobsMod.LOGGER.info("Hit entity "+hitResult.getEntity().getEntityName());
+                    if (vec != null && hitResult.getEntity() instanceof ArmorStandEntity) {
+                        //ServerMobsMod.LOGGER.info("interact_at");
+                        processInteract(player, hand, hitResult.getEntity(), (p, e, h) -> e.interactAt(p, hitResult.getPos(), h));
                     } else {
+                        //ServerMobsMod.LOGGER.info("PE::interact");
                         processInteract(player, hand, hitResult.getEntity(), PlayerEntity::interact);
                     }
                 }

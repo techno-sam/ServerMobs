@@ -155,7 +155,11 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
     }
 
     private boolean shouldTarget(LivingEntity entity) {
-        return this.getBoundingBox().expand(entity.isTouchingWater() ? 12.0d : 7.0d).intersects(entity.getBoundingBox());
+        double div = 1;
+        if (entity.getEquippedStack(EquipmentSlot.HEAD).isOf(ServerMobsMod.CROCODILE_HEAD)) {
+            div = 2;
+        }
+        return this.getBoundingBox().expand(entity.isTouchingWater() ? 12.0d/div : 7.0d/div).intersects(entity.getBoundingBox());
     }
 
     public static DefaultAttributeContainer.Builder createCrocodileAttributes() {
