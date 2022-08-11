@@ -59,12 +59,12 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     //Constructor
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world) {
         super(entityType, world);
-        explosionPower = ServerMobsMod.CONFIG.getMissileExplosionPower();
+        explosionPower = ServerMobsMod.getConfig().missileExplosionPower;
     }
 
     protected MissileEntity(EntityType<? extends MissileEntity> entityType, LivingEntity owner, World world) {
         super(entityType, owner, world);
-        explosionPower = ServerMobsMod.CONFIG.getMissileExplosionPower();
+        explosionPower = ServerMobsMod.getConfig().missileExplosionPower;
     }
 
     public static MissileEntity targeting(World world, LivingEntity owner, Entity target) {

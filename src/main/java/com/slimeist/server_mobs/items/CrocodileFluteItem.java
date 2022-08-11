@@ -58,7 +58,7 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
         } else {
             NbtCompound nbt = stack.getOrCreateSubNbt("CrocodileTarget");
             nbt.putUuid("uuid", entity.getUuid());
-            nbt.putLong("expiration", entity.getWorld().getTime() + ServerMobsMod.CONFIG.getFluteTargetExpirationTicks());
+            nbt.putLong("expiration", entity.getWorld().getTime() + ServerMobsMod.getConfig().fluteTargetExpirationTicks);
         }
     }
 

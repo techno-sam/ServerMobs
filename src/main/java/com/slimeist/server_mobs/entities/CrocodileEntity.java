@@ -421,14 +421,14 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         if (this.chompTicks > 0) {
             this.chompTicks--;
         }
-        if (this.forcedTarget != null && (this.age > ServerMobsMod.CONFIG.getFluteCrocodileSurvivalTicks() || !this.forcedTarget.isAlive())) {
+        if (this.forcedTarget != null && (this.age > ServerMobsMod.getConfig().fluteCrocodileSurvivalTicks || !this.forcedTarget.isAlive())) {
             this.forcedTarget = null;
             this.dissolve();
             return;
         }
         if (this.forcedTarget != null) {
             this.setTarget(this.forcedTarget);
-            this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED * ServerMobsMod.CONFIG.getFluteCrocodileSpeedMultiplier());
+            this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED * ServerMobsMod.getConfig().fluteCrocodileSpeedMultiplier);
         }
     }
 

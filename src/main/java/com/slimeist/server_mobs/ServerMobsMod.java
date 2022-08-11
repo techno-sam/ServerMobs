@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.entity.EntityDimensions;
@@ -28,13 +29,16 @@ import net.minecraft.world.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Path;
+
 public class ServerMobsMod implements DedicatedServerModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "server_mobs";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final ServerMobsConfig CONFIG = new ServerMobsConfig();
+	private static ServerMobsConfig config;
 
 	//BLOCKS
 	public static final CrocodileFluteBlock CROCODILE_FLUTE_BLOCK = new CrocodileFluteBlock(FabricBlockSettings.of(Material.BAMBOO, MapColor.DARK_GREEN)
@@ -121,6 +125,14 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	public static final CustomArmorItem CROCODILE_HIDE_LEGGINGS = crocodileArmor(Items.LEATHER_LEGGINGS);
 	public static final CustomArmorItem CROCODILE_HIDE_BOOTS = crocodileArmor(Items.LEATHER_BOOTS);
 
+	private static Path getConfigPath() {
+		return FabricLoader.getInstance().getConfigDir().resolve("server_mobs.json");
+	}
+
+	public static ServerMobsConfig getConfig() {
+		return config;
+	}
+
 	@Override
 	public void onInitializeServer() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -128,7 +140,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("ServerMobs loading");
-		CONFIG.loadConfig();
+		config = ServerMobsConfig.loadConfig(new File(getConfigPath().toString()));
 
 		if (PolymerRPUtils.addAssetSource(MOD_ID)) {
 			LOGGER.info("Successfully marked as asset source");
