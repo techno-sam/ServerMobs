@@ -46,8 +46,9 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	public static final CrocodileFluteItem CROCODILE_FLUTE_ITEM = new CrocodileFluteItem(
 			CROCODILE_FLUTE_BLOCK,
 			new FabricItemSettings()
-					.group(ItemGroup.COMBAT),
-			Items.BAMBOO);
+					.group(ItemGroup.COMBAT)
+					.maxDamage(40),
+			Items.CARROT_ON_A_STICK);
 
 	//ITEMS
 	public static final MissileItem MISSILE_ITEM = new MissileItem(

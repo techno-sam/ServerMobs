@@ -11,6 +11,7 @@
     "EntityAccessor",
     "FireworkRocketEntityAccessor",
     "SnowGolemEntityAccessor",
-    "BambooSaplingBlockMixin"
+    "BambooSaplingBlockMixin",
+    "BambooBlockMixin"
   ]
 }
