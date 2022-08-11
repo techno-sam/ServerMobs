@@ -68,16 +68,6 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			Items.BONE);
 
 	//ENTITIES
-	public static EntityType<GoldGolemEntity> GOLD_GOLEM = Registry.register(
-			Registry.ENTITY_TYPE,
-			id("gold_golem"),
-			FabricEntityTypeBuilder.create(SpawnGroup.MISC, GoldGolemEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
-	);
-	public static ServerEntityModelLoader GOLD_GOLEM_LOADER = new ServerEntityModelLoader(GOLD_GOLEM);
-
-	static {
-		GoldGolemEntity.setBakedModelSupplier(() -> GOLD_GOLEM_LOADER.getBakedModel());
-	}
 
 	public static EntityType<GustEntity> GUST = Registry.register(
 			Registry.ENTITY_TYPE,
@@ -99,17 +89,6 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 
 	static {
 		MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());
-	}
-
-	public static EntityType<TestEntity> TEST = Registry.register(
-			Registry.ENTITY_TYPE,
-			id("test"),
-			FabricEntityTypeBuilder.create(SpawnGroup.MISC, TestEntity::new).dimensions(EntityDimensions.fixed(0.7f, 1.9f)).trackRangeChunks(8).build()
-	);
-	public static ServerEntityModelLoader TEST_LOADER = new ServerEntityModelLoader(TEST);
-
-	static {
-		TestEntity.setBakedModelSupplier(() -> TEST_LOADER.getBakedModel());
 	}
 
 	public static EntityType<CrocodileEntity> CROCODILE = Registry.register(
@@ -180,15 +159,11 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		CROCODILE_HIDE_BOOTS.setCustomArmorColor(crocodileArmorModel.value());
 
 		//Entities
-		FabricDefaultAttributeRegistry.register(GOLD_GOLEM, GoldGolemEntity.createGoldGolemAttributes());
 		FabricDefaultAttributeRegistry.register(GUST, GustEntity.createGustAttributes());
-		FabricDefaultAttributeRegistry.register(TEST, TestEntity.createTestAttributes());
 		FabricDefaultAttributeRegistry.register(CROCODILE, CrocodileEntity.createCrocodileAttributes());
 		//No attributes for missile, it is not a LivingEntity
-		PolymerEntityUtils.registerType(GOLD_GOLEM);
 		PolymerEntityUtils.registerType(GUST);
 		PolymerEntityUtils.registerType(MISSILE);
-		PolymerEntityUtils.registerType(TEST);
 		PolymerEntityUtils.registerType(CROCODILE);
 
 		CrocodileEntity.registerSpawnRestrictions(CROCODILE);
