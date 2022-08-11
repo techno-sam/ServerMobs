@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "server_mobs",
+  "id": "server_mobs_api",
   "version": "${version}",
 
-  "name": "Server Mobs",
+  "name": "Server Mobs API",
   "description": "Create mobs serverside",
   "authors": [
     "Slimeist"
@@ -14,16 +14,16 @@
   },
 
   "license": "LGPL v3",
-  "icon": "assets/server_mobs/icon.png",
+  "icon": "assets/server_mobs_api/icon.png",
 
   "environment": "server",
   "entrypoints": {
     "server": [
-      "com.slimeist.server_mobs.ServerMobsMod"
+      "com.slimeist.server_mobs.api.ServerMobsApiMod"
     ]
   },
   "mixins": [
-    "server_mobs.mixins.json"
+    "server_mobs_api.mixins.json"
   ],
 
   "depends": {
@@ -34,12 +34,10 @@
     "polymer": "*",
     "polymer-blocks-ext": "*",
     "hologram-api": "*",
-    "nbtcrafting": "*",
-    "server_mobs_api": "${version}"
+    "nbtcrafting": "*"
   },
   "recommends": {
     "server_translations_api": "*",
     "polypack_host": "*"
-  },
-  "accessWidener" : "server_mobs.accesswidener"
+  }
 }

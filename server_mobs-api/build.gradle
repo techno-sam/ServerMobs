@@ -1,0 +1,2 @@
+ archivesBaseName = "server_mobs_api"
+ group = rootProject.group

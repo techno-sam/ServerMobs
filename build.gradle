@@ -1,76 +1,75 @@
 plugins {
 	id 'fabric-loom' version '0.12-SNAPSHOT'
-	id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
+allprojects {
+	apply plugin: 'fabric-loom'
+	apply plugin: 'maven-publish'
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-	maven { url 'https://maven.nucleoid.xyz' }
-	//Nbt Crafting
-	maven {
-		name "Siphalor's Maven"
-		url "https://maven.siphalor.de"
+	version = project.mod_version
+	group = project.maven_group
+
+	repositories {
+		// Add repositories to retrieve artifacts from in here.
+		// You should only use this when depending on other mods because
+		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+		// for more information about repositories.
+		maven { url 'https://maven.nucleoid.xyz' }
+		//Nbt Crafting
+		maven {
+			name "Siphalor's Maven"
+			url "https://maven.siphalor.de"
+		}
+		// For some testing dependencies of Nbt Crafting
+		maven {
+			name "Jitpack"
+			url "https://jitpack.io"
+		}
 	}
-	// For some testing dependencies of Nbt Crafting
-	maven {
-		name "Jitpack"
-		url "https://jitpack.io"
+
+	dependencies {
+		// To change the versions see the gradle.properties file
+		minecraft "com.mojang:minecraft:${project.minecraft_version}"
+		mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+		// Fabric API. This is technically optional, but you probably want it anyway.
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+		modImplementation include("eu.pb4:polymer:0.2.0-rc.4+1.18.2")
+		modImplementation include("eu.pb4:polymer-blocks:0.1.0-alpha.7+1.18.2")
+		modImplementation include("eu.pb4:hologram-api:0.2.1+1.18-pre5")
+		modImplementation include("fr.catcore:server-translations-api:1.4.12+1.18.2")
+	}
+
+	processResources {
+		inputs.property "version", project.version
+
+		filesMatching("fabric.mod.json") {
+			expand "version": project.version
+		}
+	}
+
+	tasks.withType(JavaCompile).configureEach {
+		// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+		it.options.release = 17
+	}
+
+	java {
+		// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+		// if it is present.
+		// If you remove this line, sources will not be generated.
+		withSourcesJar()
 	}
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	modImplementation include("eu.pb4:polymer:0.2.0-rc.4+1.18.2")
-	modImplementation include("eu.pb4:polymer-blocks:0.1.0-alpha.7+1.18.2")
-	modImplementation include("eu.pb4:hologram-api:0.2.1+1.18-pre5")
-	modImplementation include("fr.catcore:server-translations-api:1.4.12+1.18.2")
-}
-
-def includeMod(String dep) {
-	dependencies.modImplementation(dep)
-	dependencies.include(dep)
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/server_mobs.accesswidener")
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
-}
-
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+	api project(path: ":server_mobs-api", configuration: "namedElements")
 }
 
 jar {
@@ -82,6 +81,10 @@ jar {
 	exclude "**/*sync-conflict*"
 	exclude "/tools"
 	exclude "**/unused"
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/server_mobs.accesswidener")
 }
 
 // configure the maven publication
@@ -100,3 +103,5 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+remapJar.dependsOn(project(":server_mobs-api").tasks.remapJar)

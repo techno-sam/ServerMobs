@@ -1,5 +1,6 @@
 package com.slimeist.server_mobs;
 
+import com.slimeist.server_mobs.api.ServerMobsApiMod;
 import com.slimeist.server_mobs.blocks.CrocodileFluteBlock;
 import com.slimeist.server_mobs.entities.*;
 import com.slimeist.server_mobs.items.*;
@@ -138,6 +139,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+		ServerMobsApiMod.sayHello();
 
 		LOGGER.info("ServerMobs loading");
 		config = ServerMobsConfig.loadConfig(new File(getConfigPath().toString()));
