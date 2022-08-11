@@ -44,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 //use HologramAPI for model display
@@ -57,6 +58,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
     protected int chompTicks = 0;
     private double mouthAngleFactor = 0;
     protected int stunTicks;
+    protected LivingEntity forcedTarget;
 
     private static final float MOVEMENT_SPEED = 0.3f;
 
@@ -71,6 +73,13 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
 
         this.moveControl = new AquaticMoveControl(this, 40, 10, 0.13f, 0.4f, false);
         this.stepHeight = 1.0f;
+    }
+
+    public CrocodileEntity(World world, LivingEntity forcedTarget) {
+        this(world);
+        this.forcedTarget = forcedTarget;
+        this.setTarget(this.forcedTarget);
+        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED * 3);
     }
 
     @Override
@@ -145,16 +154,28 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         goalSelector.add(5, new LookAroundGoal(this));
 
 
-        targetSelector.add(1, new RevengeGoal(this));
-        targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, true, this::shouldTarget));
+        targetSelector.add(1, new ForcedTargetGoal(this));
 
-        targetSelector.add(3, new ActiveTargetGoal<>(this, WanderingTraderEntity.class, 10, false, true, null));
+        if (forcedTarget == null) {
+            targetSelector.add(2, new RevengeGoal(this));
 
-        targetSelector.add(4, new ActiveTargetGoal<>(this, SheepEntity.class, 10, false, true, null));
-        targetSelector.add(4, new ActiveTargetGoal<>(this, PigEntity.class, 10, false, true, null));
+            targetSelector.add(3, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, true, this::shouldTarget));
+
+            targetSelector.add(4, new ActiveTargetGoal<>(this, WanderingTraderEntity.class, 10, false, true, this::shouldTargetAny));
+
+            targetSelector.add(5, new ActiveTargetGoal<>(this, SheepEntity.class, 10, false, true, this::shouldTargetAny));
+            targetSelector.add(5, new ActiveTargetGoal<>(this, PigEntity.class, 10, false, true, this::shouldTargetAny));
+        }
+    }
+
+    private boolean shouldTargetAny(LivingEntity entity) {
+        return this.forcedTarget == null;
     }
 
     private boolean shouldTarget(LivingEntity entity) {
+        if (!shouldTargetAny(entity)) {
+            return false;
+        }
         double div = 1;
         if (entity.getEquippedStack(EquipmentSlot.HEAD).isOf(ServerMobsMod.CROCODILE_HEAD)) {
             div = 2;
@@ -360,6 +381,9 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         nbt.putInt("chompTicks", this.chompTicks);
         nbt.putInt("stunTicks", this.stunTicks);
         nbt.putDouble("mouthAngleFactor", this.mouthAngleFactor);
+        if (this.forcedTarget != null) {
+            nbt.putUuid("forcedTarget", this.forcedTarget.getUuid());
+        }
     }
 
     @Override
@@ -374,6 +398,17 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         if (nbt.contains("mouthAngleFactor", NbtCompound.DOUBLE_TYPE)) {
             this.mouthAngleFactor = nbt.getInt("mouthAngleFactor");
         }
+        if (nbt.containsUuid("forcedTarget")) {
+            UUID forcedTargetId = nbt.getUuid("forcedTarget");
+            if (this.world instanceof ServerWorld serverWorld) {
+                Entity forcedTarget = serverWorld.getEntity(forcedTargetId);
+                if (forcedTarget instanceof LivingEntity livingForcedTarget && livingForcedTarget.isAlive()) {
+                    this.forcedTarget = livingForcedTarget;
+                } else {
+                    this.dissolve();
+                }
+            }
+        }
     }
 
     public boolean isChomping() {
@@ -386,12 +421,47 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         if (this.chompTicks > 0) {
             this.chompTicks--;
         }
+        if (this.forcedTarget != null && (this.age > 45*20 || !this.forcedTarget.isAlive())) { //TODO config
+            this.forcedTarget = null;
+            this.dissolve();
+            return;
+        }
+        if (this.forcedTarget != null) {
+            this.setTarget(this.forcedTarget);
+        }
+    }
+
+    protected void dissolve() {
+        this.playSound(SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, 1.0f, 1.0f);
+        if (this.world instanceof ServerWorld serverWorld) {
+            serverWorld.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 0, 0, 0, 0, 0);
+        }
+        this.discard();
     }
 
     @Override
     public boolean tryAttack(Entity target) {
         this.playSound(SoundEvents.ENTITY_EVOKER_FANGS_ATTACK, 1.0f, 0.75f);
         return super.tryAttack(target);
+    }
+
+    protected static class ForcedTargetGoal extends TrackTargetGoal {
+
+        public ForcedTargetGoal(CrocodileEntity crocodileEntity) {
+            super(crocodileEntity, false, false);
+        }
+
+        @Override
+        public boolean canStart() {
+            return ((CrocodileEntity) mob).forcedTarget != null;
+        }
+
+        @Override
+        public void start() {
+            this.mob.setTarget(((CrocodileEntity) mob).forcedTarget);
+            this.target = this.mob.getTarget();
+            super.start();
+        }
     }
 
     protected class CrocodileSwimAroundGoal extends SwimAroundGoal {
@@ -697,7 +767,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         }
     }
 
-    static class CrocodileMobNavigation extends MobNavigation {
+    protected static class CrocodileMobNavigation extends MobNavigation {
 
         public CrocodileMobNavigation(CrocodileEntity crocodile, World world) {
             super(crocodile, world);
@@ -748,7 +818,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         }
     }
 
-    static class CrocodileSwimNavigation extends SwimNavigation {
+    protected static class CrocodileSwimNavigation extends SwimNavigation {
 
         CrocodileSwimNavigation(CrocodileEntity crocodile, World world) {
             super(crocodile, world);

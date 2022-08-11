@@ -1,27 +1,30 @@
 package com.slimeist.server_mobs;
 
+import com.slimeist.server_mobs.blocks.CrocodileFluteBlock;
 import com.slimeist.server_mobs.entities.*;
 import com.slimeist.server_mobs.items.*;
 import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.api.item.PolymerItem;
-import eu.pb4.polymer.api.item.SimplePolymerItem;
 import eu.pb4.polymer.api.resourcepack.PolymerArmorModel;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.MapColor;
+import net.minecraft.block.Material;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +34,20 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "server_mobs";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+	//BLOCKS
+	public static final CrocodileFluteBlock CROCODILE_FLUTE_BLOCK = new CrocodileFluteBlock(FabricBlockSettings.of(Material.BAMBOO, MapColor.DARK_GREEN)
+			.breakInstantly()
+			.strength(1.0f)
+			.sounds(BlockSoundGroup.BAMBOO)
+			.nonOpaque()
+			.dynamicBounds()
+	);
+	public static final CrocodileFluteItem CROCODILE_FLUTE_ITEM = new CrocodileFluteItem(
+			CROCODILE_FLUTE_BLOCK,
+			new FabricItemSettings()
+					.group(ItemGroup.COMBAT),
+			Items.BAMBOO);
 
 	//ITEMS
 	public static final MissileItem MISSILE_ITEM = new MissileItem(
@@ -142,12 +159,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		registerCustomModelItem(CROCODILE_HIDE_ITEM, "crocodile_hide");
 		registerCustomModelItem(CROCODILE_TOOTH_ITEM, "crocodile_tooth");
 		registerCustomModelItem(CROCODILE_SPAWN_EGG, "crocodile_spawn_egg");
+		registerCustomModelItem(CROCODILE_FLUTE_ITEM, "crocodile_flute");
 
 		registerCustomModelItem(CROCODILE_HEAD, "crocodile_head");
 		registerCustomModelItem(CROCODILE_HIDE_HELMET, "crocodile_hide_helmet");
 		registerCustomModelItem(CROCODILE_HIDE_CHESTPLATE, "crocodile_hide_chestplate");
 		registerCustomModelItem(CROCODILE_HIDE_LEGGINGS, "crocodile_hide_leggings");
 		registerCustomModelItem(CROCODILE_HIDE_BOOTS, "crocodile_hide_boots");
+
+		Registry.register(Registry.BLOCK, id("crocodile_flute"), CROCODILE_FLUTE_BLOCK);
+		CROCODILE_FLUTE_BLOCK.registerModel();
 
 		PolymerArmorModel crocodileArmorModel = PolymerRPUtils.requestArmor(id("crocodile_hide"));
 		CROCODILE_HIDE_HELMET.setCustomArmorColor(crocodileArmorModel.value());

@@ -49,7 +49,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     private float maxVelocitySq = 0.5f;
     private float accel = 1.05f; // straight line acceleration
     private float turnSpeed = 0.1f;
-    private float explosionPower = 2f;
+    private float explosionPower = 2f; //TODO config
     private boolean outOfFuel = false;
     //End values from Pneumaticraft
 

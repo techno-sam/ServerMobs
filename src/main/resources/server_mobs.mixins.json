@@ -10,6 +10,7 @@
     "ArmorStandEntityAccessor",
     "EntityAccessor",
     "FireworkRocketEntityAccessor",
-    "SnowGolemEntityAccessor"
+    "SnowGolemEntityAccessor",
+    "BambooSaplingBlockMixin"
   ]
 }

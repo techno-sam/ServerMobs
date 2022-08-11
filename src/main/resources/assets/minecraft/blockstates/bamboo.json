@@ -1,0 +1,70 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "stage": "1"
+      },
+      "apply": {
+        "model": "server_mobs:block/crocodile_flute"
+      }
+    },
+    {
+      "when": {
+        "age": "0",
+        "stage": "0"
+      },
+      "apply": [
+        {
+          "model": "minecraft:block/bamboo1_age0"
+        },
+        {
+          "model": "minecraft:block/bamboo2_age0"
+        },
+        {
+          "model": "minecraft:block/bamboo3_age0"
+        },
+        {
+          "model": "minecraft:block/bamboo4_age0"
+        }
+      ]
+    },
+    {
+      "when": {
+        "age": "1",
+        "stage": "0"
+      },
+      "apply": [
+        {
+          "model": "minecraft:block/bamboo1_age1"
+        },
+        {
+          "model": "minecraft:block/bamboo2_age1"
+        },
+        {
+          "model": "minecraft:block/bamboo3_age1"
+        },
+        {
+          "model": "minecraft:block/bamboo4_age1"
+        }
+      ]
+    },
+    {
+      "when": {
+        "leaves": "small",
+        "stage": "0"
+      },
+      "apply": {
+        "model": "minecraft:block/bamboo_small_leaves"
+      }
+    },
+    {
+      "when": {
+        "leaves": "large",
+        "stage": "0"
+      },
+      "apply": {
+        "model": "minecraft:block/bamboo_large_leaves"
+      }
+    }
+  ]
+}

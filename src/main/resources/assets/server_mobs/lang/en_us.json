@@ -9,14 +9,19 @@
   "item.server_mobs.crocodile_hide": "Crocodile Hide",
   "item.server_mobs.crocodile_tooth": "Crocodile Tooth",
 
+  "block.server_mobs.crocodile_flute": "Crocodile Flute",
+
   "entity.server_mobs.gust": "Gust",
   "entity.server_mobs.gold_golem": "Gold Golem",
   "entity.server_mobs.missile": "Missile",
   "entity.server_mobs.test": "Test Mob",
   "entity.server_mobs.crocodile": "Crocodile",
 
-  "server_mobs.tooltip.missile": "Point at target to lock target, then use to fire.",
-  "server_mobs.missile.target_locked": "\u00A7aTarget Locked\u00A7r",
-  "server_mobs.missile.target_locked_named": "\u00A7aTarget \u00A7n%s\u00A7r\u00A7a Locked\u00A7r",
-  "server_mobs.missile.no_target": "\u00A74No Target\u00A7r"
+  "tooltip.server_mobs.missile": "Point at target to lock target, then use to fire.",
+  "tootip.server_mobs.missile.target_locked": "\u00A7aTarget Locked\u00A7r",
+  "tooltip.server_mobs.missile.target_locked_named": "\u00A7aTarget \u00A7n%s\u00A7r\u00A7a Locked\u00A7r",
+  "tooltip.server_mobs.missile.no_target": "\u00A74No Target\u00A7r",
+  "tooltip.server_mobs.crocodile_flute.expiration_time.seconds": "Target expires in: \u00A74\u00A7l%s seconds\u00A7r",
+  "tooltip.server_mobs.crocodile_flute.expiration_time.minutes_seconds": "Target expires in: \u00A74\u00A7l%s:%s\u00A7r",
+  "tooltip.server_mobs.crocodile_flute.target_uuid": "Target UUID: \u00A75\u00A7l%s\u00A7r"
 }

@@ -68,7 +68,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
                     if (dispName != null) {
                         player.sendMessage(new TranslatableText("server_mobs.missile.target_locked_named", dispName), true);
                     } else {
-                        player.sendMessage(new TranslatableText("server_mobs.missile.target_locked"), true);
+                        player.sendMessage(new TranslatableText("tootip.server_mobs.missile.target_locked"), true);
                     }
                     if (entityHitResult.getEntity() instanceof LivingEntity living) {
                         living.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 10, 0, false, false, false));
