@@ -132,6 +132,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
     //FireworkStarItem tooltip
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        tooltip.add(new TranslatableText("tooltip.server_mobs.missile"));
         NbtCompound nbtCompound = stack.getSubNbt("Explosion");
         if (nbtCompound != null) {
             FireworkStarItem.appendFireworkTooltip(nbtCompound, tooltip);

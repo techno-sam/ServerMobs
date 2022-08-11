@@ -1,5 +1,6 @@
 package com.slimeist.server_mobs.items;
 
+import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.entities.CrocodileEntity;
 import eu.pb4.polymer.api.item.PolymerItem;
 import net.minecraft.block.Block;
@@ -57,7 +58,7 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
         } else {
             NbtCompound nbt = stack.getOrCreateSubNbt("CrocodileTarget");
             nbt.putUuid("uuid", entity.getUuid());
-            nbt.putLong("expiration", entity.getWorld().getTime() + 90 * 20);
+            nbt.putLong("expiration", entity.getWorld().getTime() + ServerMobsMod.CONFIG.getFluteTargetExpirationTicks());
         }
     }
 
@@ -107,6 +108,10 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
         return null;
     }
 
+    public static boolean hasTarget(ItemStack stack, World world) {
+        return getTarget(stack, world) != null;
+    }
+
     @Override
     protected boolean canPlace(ItemPlacementContext context, BlockState state) {
         return getTarget(context.getStack(), context.getWorld())==null && super.canPlace(context, state);
@@ -138,25 +143,31 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
         return TypedActionResult.fail(stack);
     }
 
+    static String str(int seconds) {
+        return (seconds < 10 ? "0" : "") + seconds;
+    }
+
     static TranslatableText expirationText(ItemStack stack, World world) {
         int ticks = (int) (getExpiration(stack) - world.getTime());
         int raw_seconds = ticks/20;
 
         if (raw_seconds <= 60)
-            return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.seconds", raw_seconds);
+            return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.seconds", str(raw_seconds));
 
         int minutes = raw_seconds / 60;
         int seconds = raw_seconds % 60;
 
-        return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.minutes_seconds", minutes, seconds);
+        return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.minutes_seconds", minutes, str(seconds));
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
         if (world != null) {
-            if (!isExpired(stack, world)) {
+            if (hasTarget(stack, world)) {
                 tooltip.add(expirationText(stack, world));
+            } else {
+                setTarget(stack, null);
             }
             if (context.isAdvanced() && world instanceof ServerWorld serverWorld) {
                 UUID uuid = getTargetUuid(stack, serverWorld);

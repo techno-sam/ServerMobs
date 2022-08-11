@@ -79,7 +79,6 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         this(world);
         this.forcedTarget = forcedTarget;
         this.setTarget(this.forcedTarget);
-        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED * 3);
     }
 
     @Override
@@ -286,6 +285,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         byte baseFlag = 0;
         baseFlag = modifyFlag(baseFlag, 5, true); //set invisible
         baseFlag = modifyFlag(baseFlag, 6, this.isGlowing()); //set glowing
+        baseFlag = modifyFlag(baseFlag, ON_FIRE_FLAG_INDEX, this.doesRenderOnFire());
         data.add(new DataTracker.Entry<>(FLAGS, baseFlag));
         data.add(new DataTracker.Entry<>(EntityAccessor.getSILENT(), true));
         //data.add(new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(new LiteralText("Gold Golem"))));
@@ -421,13 +421,14 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         if (this.chompTicks > 0) {
             this.chompTicks--;
         }
-        if (this.forcedTarget != null && (this.age > 45*20 || !this.forcedTarget.isAlive())) { //TODO config
+        if (this.forcedTarget != null && (this.age > ServerMobsMod.CONFIG.getFluteCrocodileSurvivalTicks() || !this.forcedTarget.isAlive())) {
             this.forcedTarget = null;
             this.dissolve();
             return;
         }
         if (this.forcedTarget != null) {
             this.setTarget(this.forcedTarget);
+            this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED * ServerMobsMod.CONFIG.getFluteCrocodileSpeedMultiplier());
         }
     }
 

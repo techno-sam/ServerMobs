@@ -49,7 +49,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     private float maxVelocitySq = 0.5f;
     private float accel = 1.05f; // straight line acceleration
     private float turnSpeed = 0.1f;
-    private float explosionPower = 2f; //TODO config
+    private float explosionPower;
     private boolean outOfFuel = false;
     //End values from Pneumaticraft
 
@@ -59,10 +59,12 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     //Constructor
     public MissileEntity(EntityType<? extends MissileEntity> entityType, World world) {
         super(entityType, world);
+        explosionPower = ServerMobsMod.CONFIG.getMissileExplosionPower();
     }
 
     protected MissileEntity(EntityType<? extends MissileEntity> entityType, LivingEntity owner, World world) {
         super(entityType, owner, world);
+        explosionPower = ServerMobsMod.CONFIG.getMissileExplosionPower();
     }
 
     public static MissileEntity targeting(World world, LivingEntity owner, Entity target) {

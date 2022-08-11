@@ -24,10 +24,12 @@ public class BambooBlockMixin {
     @Inject(at = @At("RETURN"), method = "updateLeaves")
     private void updateLeavesPost(BlockState state, World world, BlockPos pos, Random random, int height, CallbackInfo ci) {
         if (world instanceof ServerWorld serverWorld) {
-            BlockState upState = world.getBlockState(pos.up());
-            for (ServerPlayerEntity player : PlayerLookup.tracking(serverWorld, pos.up())) {
-                BlockState clientState = PolymerBlockUtils.getPolymerBlockState(upState, player);
-                player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos, clientState));
+            for (BlockPos blockPos : new BlockPos[] {pos, pos.up()}) {
+                BlockState upState = world.getBlockState(blockPos);
+                for (ServerPlayerEntity player : PlayerLookup.tracking(serverWorld, blockPos)) {
+                    BlockState clientState = PolymerBlockUtils.getPolymerBlockState(upState, player);
+                    player.networkHandler.sendPacket(new BlockUpdateS2CPacket(blockPos, clientState));
+                }
             }
         }
     }

@@ -34,6 +34,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "server_mobs";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final ServerMobsConfig CONFIG = new ServerMobsConfig();
 
 	//BLOCKS
 	public static final CrocodileFluteBlock CROCODILE_FLUTE_BLOCK = new CrocodileFluteBlock(FabricBlockSettings.of(Material.BAMBOO, MapColor.DARK_GREEN)
@@ -47,7 +48,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 			CROCODILE_FLUTE_BLOCK,
 			new FabricItemSettings()
 					.group(ItemGroup.COMBAT)
-					.maxDamage(40),
+					.maxDamage(25),
 			Items.CARROT_ON_A_STICK);
 
 	//ITEMS
@@ -148,6 +149,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("ServerMobs loading");
+		CONFIG.loadConfig();
 
 		if (PolymerRPUtils.addAssetSource(MOD_ID)) {
 			LOGGER.info("Successfully marked as asset source");
