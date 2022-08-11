@@ -66,15 +66,15 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
                 if (hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() != null) {
                     Text dispName = entityHitResult.getEntity().getDisplayName();
                     if (dispName != null) {
-                        player.sendMessage(new TranslatableText("server_mobs.missile.target_locked_named", dispName), true);
+                        player.sendMessage(new TranslatableText("tooltip.server_mobs.missile.target_locked_named", dispName), true);
                     } else {
-                        player.sendMessage(new TranslatableText("tootip.server_mobs.missile.target_locked"), true);
+                        player.sendMessage(new TranslatableText("tooltip.server_mobs.missile.target_locked"), true);
                     }
                     if (entityHitResult.getEntity() instanceof LivingEntity living) {
                         living.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 10, 0, false, false, false));
                     }
                 } else {
-                    player.sendMessage(new TranslatableText("server_mobs.missile.no_target"), true);
+                    player.sendMessage(new TranslatableText("tooltip.server_mobs.missile.no_target"), true);
                 }
             }
         }
@@ -115,7 +115,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
             stack.decrement(1);
             return TypedActionResult.success(stack);
         } else {
-            user.sendMessage(new TranslatableText("server_mobs.missile.no_target"), true);
+            user.sendMessage(new TranslatableText("tooltip.server_mobs.missile.no_target"), true);
             return TypedActionResult.fail(stack);
         }
     }
