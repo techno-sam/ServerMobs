@@ -125,9 +125,9 @@ if (System.getenv("MODRINTH_TOKEN")) {
 			required.project("fabric-api")
 			required.project("nbt-crafting")
 			required.project("server_mobs_api")
+			required.project("polypack_host")
 			embedded.project("holograms")
 			embedded.project("polymer")
-			optional.project("polypack_host")
 		}
 	}
 

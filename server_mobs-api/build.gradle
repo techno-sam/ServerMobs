@@ -32,9 +32,9 @@ if (System.getenv("MODRINTH_TOKEN")) {
         loaders = ["fabric"]
         dependencies {
             required.project("fabric-api")
+            required.project("polypack_host")
             embedded.project("holograms")
             embedded.project("polymer")
-            optional.project("polypack_host")
         }
     }
 }
