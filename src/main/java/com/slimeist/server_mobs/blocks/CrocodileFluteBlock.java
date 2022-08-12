@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
+@SuppressWarnings("deprecation")
 public class CrocodileFluteBlock extends Block implements PolymerTexturedBlock, PolymerBlock {
 
     private static boolean registeredBambooStates = false;
@@ -43,6 +44,7 @@ public class CrocodileFluteBlock extends Block implements PolymerTexturedBlock, 
         return Blocks.BAMBOO;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public void registerModel() {
         if (!registeredBambooStates) {
             BlockMapper.DEFAULT_MAPPER_EVENT.register((player, mapper) -> BlockExtBlockMapper.INSTANCE);

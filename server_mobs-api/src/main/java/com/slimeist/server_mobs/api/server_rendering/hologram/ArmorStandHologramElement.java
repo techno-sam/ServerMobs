@@ -90,8 +90,6 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
         Vec3d pos = hologram.getElementPosition(this).add(this.offset);
         this.entity.requestTeleport(pos.x, pos.y - 0.00, pos.z);
 
-        //this.createRemovePackets(player, hologram);
-        //this.createSpawnPackets(player, hologram);
         {
             EntityPositionS2CPacket posPacket = new EntityPositionS2CPacket(this.entity);
             player.networkHandler.sendPacket(posPacket);

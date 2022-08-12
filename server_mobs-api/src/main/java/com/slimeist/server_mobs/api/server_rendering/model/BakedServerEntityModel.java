@@ -81,12 +81,6 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
 
             nbt.putInt("CustomModelData", data.value());
 
-            /*{
-                NbtCompound display = new NbtCompound();
-                display.putInt("color", damageFlash ? 0xFF9595 : -1); //-1 is white
-                nbt.put("display", display);
-            }*/
-
             displayStack.setNbt(nbt);
             return displayStack;
         }
@@ -168,8 +162,6 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         }
 
         public void updateHologram() {
-            //this.hologram.addItemStack(this.itemStack, false);
-            //this.hologram.setOffset(new Vec3d(0, -1.1865, 0));
             if (this.entity instanceof IServerRenderedEntity serverRenderedEntity) {
                 if (!this.initializedAngles) {
                     serverRenderedEntity.initAngles();
@@ -189,16 +181,10 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                     }
                 });
             }
-            /*this.displayPieces.forEach(((modelGroup, modelDisplayPiece) -> {
-                modelDisplayPiece.armorStand.setInvisible(false);
-            }));*/
             if (this.hologramDirty) {
                 this.hologram.syncPositionWithEntity();
                 this.hologramDirty = false;
             }
-            /*ArmorStandEntity armorStand = this.displayPieces.get(getModelGroup("base.body_bottom")).armorStand;
-            armorStand.setHeadRotation(new EulerAngle(0.0f, (float) (this.entity.bodyYaw), 0.0f));
-            armorStand.setInvisible(false);*/
         }
 
         private static EulerAngle add(EulerAngle a, EulerAngle b) {
@@ -223,10 +209,6 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                         double y_rad = Math.toRadians(-parentRot.getWrappedYaw());
                         double z_rad = Math.toRadians(-parentRot.getWrappedRoll());
 
-                        /*Vec3d rotatedRelativePivot = piece.parentRelativePivot
-                                .rotateZ(z_rad)
-                                .rotateX(x_rad)
-                                .rotateY(y_rad);*/
                         Vec3d rotatedRelativePivot = ModelUtil.rotate(piece.parentRelativePivot, x_rad, y_rad, z_rad);
 
                         setPartPivot(partPath, getPartPivot(parentPath).add(rotatedRelativePivot));

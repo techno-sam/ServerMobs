@@ -1,12 +1,12 @@
 package com.slimeist.server_mobs;
 
 import com.slimeist.server_mobs.api.ServerMobsApiMod;
+import com.slimeist.server_mobs.api.server_rendering.model.ServerEntityModelLoader;
 import com.slimeist.server_mobs.blocks.CrocodileFluteBlock;
 import com.slimeist.server_mobs.entities.CrocodileEntity;
 import com.slimeist.server_mobs.entities.GustEntity;
 import com.slimeist.server_mobs.entities.MissileEntity;
 import com.slimeist.server_mobs.items.*;
-import com.slimeist.server_mobs.api.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.api.item.PolymerItem;
 import eu.pb4.polymer.api.resourcepack.PolymerArmorModel;
@@ -76,37 +76,37 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 
     //ENTITIES
 
-    public static EntityType<GustEntity> GUST = Registry.register(
+    public static final EntityType<GustEntity> GUST = Registry.register(
             Registry.ENTITY_TYPE,
             id("gust"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC, GustEntity::new).dimensions(EntityDimensions.fixed(0.875f, 1.5f)).trackRangeChunks(8).build()
     );
-    public static ServerEntityModelLoader GUST_LOADER = new ServerEntityModelLoader(GUST);
+    public static final ServerEntityModelLoader GUST_LOADER = new ServerEntityModelLoader(GUST);
 
     static {
-        GustEntity.setBakedModelSupplier(() -> GUST_LOADER.getBakedModel());
+        GustEntity.setBakedModelSupplier(GUST_LOADER::getBakedModel);
     }
 
-    public static EntityType<MissileEntity> MISSILE = Registry.register(
+    public static final EntityType<MissileEntity> MISSILE = Registry.register(
             Registry.ENTITY_TYPE,
             id("missile"),
             FabricEntityTypeBuilder.create(SpawnGroup.MISC, MissileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackRangeChunks(8).build()
     );
-    public static ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_entity.bbmodel", false);
+    public static final ServerEntityModelLoader MISSILE_LOADER = new ServerEntityModelLoader(MISSILE, "missile_entity.bbmodel", false);
 
     static {
-        MissileEntity.setBakedModelSupplier(() -> MISSILE_LOADER.getBakedModel());
+        MissileEntity.setBakedModelSupplier(MISSILE_LOADER::getBakedModel);
     }
 
-    public static EntityType<CrocodileEntity> CROCODILE = Registry.register(
+    public static final EntityType<CrocodileEntity> CROCODILE = Registry.register(
             Registry.ENTITY_TYPE,
             id("crocodile"),
             FabricEntityTypeBuilder.<CrocodileEntity>create(SpawnGroup.MONSTER, CrocodileEntity::new).dimensions(EntityDimensions.fixed(1.1875f, 0.75f)).trackRangeChunks(8).build()
     );
-    public static ServerEntityModelLoader CROCODILE_LOADER = new ServerEntityModelLoader(CROCODILE);
+    public static final ServerEntityModelLoader CROCODILE_LOADER = new ServerEntityModelLoader(CROCODILE);
 
     static {
-        CrocodileEntity.setBakedModelSupplier(() -> CROCODILE_LOADER.getBakedModel());
+        CrocodileEntity.setBakedModelSupplier(CROCODILE_LOADER::getBakedModel);
     }
 
     public static final CustomPolymerSpawnEggItem CROCODILE_SPAWN_EGG = new CustomPolymerSpawnEggItem(CROCODILE, Items.GHAST_SPAWN_EGG, new FabricItemSettings().group(ItemGroup.MISC));
@@ -137,6 +137,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onInitializeServer() {
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.

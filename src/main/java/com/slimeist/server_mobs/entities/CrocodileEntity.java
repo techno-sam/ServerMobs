@@ -3,12 +3,11 @@ package com.slimeist.server_mobs.entities;
 import com.google.common.collect.ImmutableSet;
 import com.slimeist.server_mobs.ModBlockTags;
 import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.mixin.EntityAccessor;
 import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.api.server_rendering.model.BakedServerEntityModel;
+import com.slimeist.server_mobs.mixin.EntityAccessor;
 import eu.pb4.polymer.api.entity.PolymerEntity;
 import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.AquaticMoveControl;
@@ -24,7 +23,6 @@ import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.WanderingTraderEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -89,9 +87,8 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
     @Override
     public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() && this.isTouchingWater()) {
-            boolean slowUp = this.world.getFluidState(this.getBlockPos().up(1)).isOf(Fluids.EMPTY) && this.getVelocity().getY() > 0.15 && false;
 
-            Vec3d velMul = new Vec3d(1, slowUp ? 0.6 : 1, 1); //prevent wild bobbing out of the water
+            Vec3d velMul = new Vec3d(1, 1, 1); //prevent wild bobbing out of the water
 
             this.updateVelocity(this.getMovementSpeed(), movementInput);
             this.move(MovementType.SELF, this.getVelocity().multiply(velMul));
@@ -205,19 +202,6 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         return target != null && !target.isTouchingWater();
     }
 
-    /*@Override
-    public void updateSwimming() {
-        if (!this.world.isClient) {
-            if (this.canMoveVoluntarily() && this.isTouchingWater() && !this.isTargetingOnLand()) {
-                this.navigation = this.waterNavigation;
-                this.setSwimming(true);
-            } else {
-                this.navigation = this.landNavigation;
-                this.setSwimming(false);
-            }
-        }
-    }*/
-
     @Override
     public void tick() {
         super.tick();
@@ -284,8 +268,6 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         baseFlag = modifyFlag(baseFlag, ON_FIRE_FLAG_INDEX, this.doesRenderOnFire());
         data.add(new DataTracker.Entry<>(FLAGS, baseFlag));
         data.add(new DataTracker.Entry<>(EntityAccessor.getSILENT(), true));
-        //data.add(new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(new LiteralText("Gold Golem"))));
-        //data.add(new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), true));
     }
 
     @Override
@@ -309,13 +291,6 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
     @Override
     public void updateAngles() {
         //this.getModelInstance().setPartRotation("base.main", new EulerAngle(this.getPitch(), this.headYaw, 0));
-        /*float cycle_time = 40;
-        boolean backwards = (this.age % (cycle_time*2)) >= cycle_time;
-        float pitch = MathHelper.lerp((this.age%cycle_time)/cycle_time, 0, 45);
-        if (backwards)
-            pitch = MathHelper.lerp((this.age%cycle_time)/cycle_time, 45, 0);
-//        pitch = 0;
-        this.getModelInstance().setPartRotation("base.main", new EulerAngle(pitch, 0, 0));*/
         // Body Rotation
         this.getModelInstance().setPartPivot("base.body", Vec3d.ZERO);
         this.getModelInstance().setPartRotation("base.body", new EulerAngle(0, this.bodyYaw, 0));
@@ -363,8 +338,6 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         for (String path : parent_locals) {
             this.getModelInstance().setPartParentLocal(path, true);
         }
-        //this.getModelInstance().setPartParentLocal("base.main.oversize", true);
-        //this.getModelInstance().setPartParentLocal("base.main.oversize.leaves", true);
     }
 
     public static void setBakedModelSupplier(Supplier<BakedServerEntityModel> bakedModel) {
@@ -601,8 +574,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
             } else {
                 for (int i = 0; i < 16; ++i) {
                     double h = 1.25 * (double) (i + 1);
-                    int j = 1 * i;
-                    this.conjureFangs(CrocodileEntity.this.getX() + (double) MathHelper.cos(f) * h, CrocodileEntity.this.getZ() + (double) MathHelper.sin(f) * h, d, e, f, j);
+                    this.conjureFangs(CrocodileEntity.this.getX() + (double) MathHelper.cos(f) * h, CrocodileEntity.this.getZ() + (double) MathHelper.sin(f) * h, d, e, f, i);
                 }
             }
         }
@@ -612,13 +584,11 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
             boolean bl = false;
             double d = 0.0;
             do {
-                BlockState blockState2;
                 VoxelShape voxelShape;
                 BlockPos blockPos2;
-                BlockState blockState;
-                if (!(blockState = CrocodileEntity.this.world.getBlockState(blockPos2 = blockPos.down())).isSideSolidFullSquare(CrocodileEntity.this.world, blockPos2, Direction.UP))
+                if (!CrocodileEntity.this.world.getBlockState(blockPos2 = blockPos.down()).isSideSolidFullSquare(CrocodileEntity.this.world, blockPos2, Direction.UP))
                     continue;
-                if (!CrocodileEntity.this.world.isAir(blockPos) && !(voxelShape = (blockState2 = CrocodileEntity.this.world.getBlockState(blockPos)).getCollisionShape(CrocodileEntity.this.world, blockPos)).isEmpty()) {
+                if (!CrocodileEntity.this.world.isAir(blockPos) && !(voxelShape = CrocodileEntity.this.world.getBlockState(blockPos).getCollisionShape(CrocodileEntity.this.world, blockPos)).isEmpty()) {
                     d = voxelShape.getMax(Direction.Axis.Y);
                 }
                 bl = true;
@@ -851,6 +821,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         return world.doesNotIntersectEntities(this);
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean canSpawn(EntityType<? extends CrocodileEntity> type, WorldAccess world, SpawnReason reason, BlockPos pos, Random random) {
         int minHeight = world.getSeaLevel() - 5;
         return world.getDifficulty() != Difficulty.PEACEFUL && pos.getY() >= minHeight && world.getBlockState(pos.down()).isIn(ModBlockTags.CROCODILES_SPAWNABLE_ON);

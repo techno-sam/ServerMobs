@@ -1,8 +1,8 @@
 package com.slimeist.server_mobs.entities;
 
-import com.slimeist.server_mobs.mixin.EntityAccessor;
 import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.api.server_rendering.model.BakedServerEntityModel;
+import com.slimeist.server_mobs.mixin.EntityAccessor;
 import eu.pb4.holograms.mixin.accessors.SlimeEntityAccessor;
 import eu.pb4.polymer.api.entity.PolymerEntity;
 import net.minecraft.block.BlockState;

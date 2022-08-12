@@ -7,8 +7,8 @@
     "defaultRequire": 1
   },
   "server": [
-    "EntityAccessor",
+    "BambooBlockMixin",
     "BambooSaplingBlockMixin",
-    "BambooBlockMixin"
+    "EntityAccessor"
   ]
 }

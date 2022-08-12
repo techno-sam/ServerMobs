@@ -181,10 +181,6 @@ public class ServerEntityModelLoader {
         //stand_scale = ScaleUtils.Scale.BIG; //debug for something?
         group.setArmorStandScale(stand_scale);
 
-        /*if (divide != 1) {
-            ServerMobsMod.LOGGER.warn("Shrank item model for "+baseLoc+" by "+divide);
-        }*/
-
         //elements
         int numElements;
         {

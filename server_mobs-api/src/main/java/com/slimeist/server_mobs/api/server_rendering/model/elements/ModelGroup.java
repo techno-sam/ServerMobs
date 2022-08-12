@@ -36,15 +36,6 @@ public class ModelGroup implements IBakedModelPart {
         this.name = name;
         this.transform = transform;//ModelTransform.rotation(transform.pitch, transform.yaw, transform.roll);
         this.childGroups = childGroups;
-        /*ModelBox[] wipBoxes = new ModelBox[boxes.length];
-        for (int i=0; i<boxes.length; i++) {
-            ModelBox box = boxes[i];
-            ModelBox.Builder b = new ModelBox.Builder(box);
-            Vec3f origin = new Vec3f(transform.pivotX, transform.pivotY, transform.pivotZ);
-            b.from.subtract(origin);
-            b.to.subtract(origin);
-            wipBoxes[i] = b.build();
-        }*/
         ArrayList<String> names = new ArrayList<>();
         Arrays.stream(this.childGroups).forEach((modelGroup -> {
             if (names.contains(modelGroup.name)) {

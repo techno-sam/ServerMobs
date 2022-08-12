@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 //Sort of a port of Pneumaticraft's Micromissile
+@SuppressWarnings("FieldCanBeLocal")
 public class MissileEntity extends ThrownEntity implements PolymerEntity, IServerRenderedEntity {
 
     private static Supplier<BakedServerEntityModel> bakedModelSupplier;
@@ -48,10 +49,11 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     private double targetZ;
 
     //Values from Pneumaticraft
-    private float maxVelocitySq = 0.5f;
-    private float accel = 1.05f; // straight line acceleration
-    private float turnSpeed = 0.1f;
-    private float explosionPower;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final float maxVelocitySq = 0.5f;
+    private final float accel = 1.05f; // straight line acceleration
+    private final float turnSpeed = 0.1f;
+    private final float explosionPower;
     private boolean outOfFuel = false;
     //End values from Pneumaticraft
 
@@ -314,6 +316,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
         this.setVelocity(x, y, z);
 
         float f1 = MathHelper.sqrt((float) (x * x + z * z));
+        //noinspection SuspiciousNameCombination
         this.setYaw((float) (MathHelper.atan2(x, z) * (180D / Math.PI)));
         this.setPitch((float) (MathHelper.atan2(y, f1) * (180D / Math.PI)));
         this.prevYaw = this.getYaw();
