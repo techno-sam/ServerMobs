@@ -112,20 +112,22 @@ publishing {
 
 remapJar.dependsOn(project(":server_mobs-api").tasks.remapJar)
 
-modrinth {
-	token = System.getenv("MODRINTH_TOKEN")
-	projectId = "server_mobs"
-	versionNumber = version
-	versionType = "release"
-	uploadFile = remapJar
-	gameVersions = ["1.18.2"]
-	loaders = ["fabric"]
-	dependencies {
-		required.project "fabric-api"
-		required.project "nbt-crafting"
-		required.project "server_mobs_api"
-		embedded.project "holograms"
-		embedded.project "polymer"
-		optional.project "polypack_host"
+if (System.getenv("MODRINTH_TOKEN")) {
+	modrinth {
+		token = System.getenv("MODRINTH_TOKEN")
+		projectId = "2KY8POfs"
+		versionNumber = "" + version
+		versionType = "release"
+		uploadFile = remapJar
+		gameVersions = [((String) project.minecraft_version)]
+		loaders = ["fabric"]
+		dependencies {
+			required.project("fabric-api")
+			required.project("nbt-crafting")
+			required.project("server_mobs_api")
+			embedded.project("holograms")
+			embedded.project("polymer")
+			optional.project("polypack_host")
+		}
 	}
 }

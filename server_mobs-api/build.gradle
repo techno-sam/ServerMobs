@@ -1,3 +1,7 @@
+plugins {
+    id 'com.modrinth.minotaur' version '2.+'
+}
+
 archivesBaseName = project.archives_base_name + "_api"
 group = rootProject.group
 version = project.api_version
@@ -17,18 +21,20 @@ jar {
     exclude "**/unused"
 }
 
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN")
-    projectId = "server_mobs_api"
-    versionNumber = api_version
-    versionType = "alpha"
-    uploadFile = remapJar
-    gameVersions = ["1.18.2"]
-    loaders = ["fabric"]
-    dependencies {
-        required.project "fabric-api"
-        embedded.project "holograms"
-        embedded.project "polymer"
-        optional.project "polypack_host"
+if (System.getenv("MODRINTH_TOKEN")) {
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN")
+        projectId = "5yRAzwig"
+        versionNumber = "" + api_version
+        versionType = "alpha"
+        uploadFile = remapJar
+        gameVersions = [((String) project.minecraft_version)]
+        loaders = ["fabric"]
+        dependencies {
+            required.project("fabric-api")
+            embedded.project("holograms")
+            embedded.project("polymer")
+            optional.project("polypack_host")
+        }
     }
 }
