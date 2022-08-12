@@ -33,8 +33,7 @@
     "java": ">=17",
     "polymer": "*",
     "polymer-blocks-ext": "*",
-    "hologram-api": "*",
-    "nbtcrafting": "*"
+    "hologram-api": "*"
   },
   "recommends": {
     "server_translations_api": "*",
