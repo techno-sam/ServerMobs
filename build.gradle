@@ -115,10 +115,10 @@ remapJar.dependsOn(project(":server_mobs-api").tasks.remapJar)
 if (System.getenv("MODRINTH_TOKEN")) {
 	modrinth {
 		token = System.getenv("MODRINTH_TOKEN")
-		projectId = "2KY8POfs"
+		projectId = "server_mobs"
 		versionNumber = "" + version
 		versionType = "release"
-		uploadFile = remapJar
+		uploadFile = project.remapJar
 		gameVersions = [((String) project.minecraft_version)]
 		loaders = ["fabric"]
 		dependencies {
@@ -130,4 +130,8 @@ if (System.getenv("MODRINTH_TOKEN")) {
 			optional.project("polypack_host")
 		}
 	}
+
+	/*remapJar {
+		finalizedBy project.tasks.modrinth
+	}*/
 }

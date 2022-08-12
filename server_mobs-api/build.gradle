@@ -24,10 +24,10 @@ jar {
 if (System.getenv("MODRINTH_TOKEN")) {
     modrinth {
         token = System.getenv("MODRINTH_TOKEN")
-        projectId = "5yRAzwig"
+        projectId = "server_mobs_api"
         versionNumber = "" + api_version
         versionType = "alpha"
-        uploadFile = remapJar
+        uploadFile = project.remapJar
         gameVersions = [((String) project.minecraft_version)]
         loaders = ["fabric"]
         dependencies {
