@@ -1,5 +1,6 @@
 plugins {
 	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'com.modrinth.minotaur' version '2.+'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -49,9 +50,11 @@ allprojects {
 
 	processResources {
 		inputs.property "version", project.version
+		inputs.property "api_version", project.api_version
 
 		filesMatching("fabric.mod.json") {
 			expand "version": project.version
+			expand "api_version": project.api_version
 		}
 	}
 
@@ -105,3 +108,21 @@ publishing {
 }
 
 remapJar.dependsOn(project(":server_mobs-api").tasks.remapJar)
+
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = "server_mobs"
+	versionNumber = version
+	versionType = "release"
+	uploadFile = remapJar
+	gameVersions = ["1.18.2"]
+	loaders = ["fabric"]
+	dependencies {
+		required.project "fabric-api"
+		required.project "nbt-crafting"
+		required.project "server_mobs_api"
+		embedded.project "holograms"
+		embedded.project "polymer"
+		optional.project "polypack_host"
+	}
+}

@@ -15,3 +15,19 @@ jar {
     exclude "/tools"
     exclude "**/unused"
 }
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "server_mobs_api"
+    versionNumber = api_version
+    versionType = "alpha"
+    uploadFile = remapJar
+    gameVersions = ["1.18.2"]
+    loaders = ["fabric"]
+    dependencies {
+        required.project "fabric-api"
+        embedded.project "holograms"
+        embedded.project "polymer"
+        optional.project "polypack_host"
+    }
+}

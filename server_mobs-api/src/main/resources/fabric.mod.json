@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "server_mobs_api",
-  "version": "${version}",
+  "version": "${api_version}",
 
   "name": "Server Mobs API",
   "description": "Library to create mobs serverside - if you are looking for actual content, download ServerMobs",
