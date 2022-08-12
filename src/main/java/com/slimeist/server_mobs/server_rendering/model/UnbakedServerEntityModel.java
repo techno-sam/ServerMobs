@@ -44,7 +44,7 @@ public class UnbakedServerEntityModel {
     }
 
     public BakedServerEntityModel bake(boolean forceMarker) {
-        if (this.baked==null) {
+        if (this.baked == null) {
             GroupElement baseElement = new GroupElement("base", ModelTransform.NONE, "base-uuid", outlineElements);
             ModelGroup base = baseElement.bake(this);
             this.baked = new BakedServerEntityModel(this.texWidth, this.texHeight, base, forceMarker);

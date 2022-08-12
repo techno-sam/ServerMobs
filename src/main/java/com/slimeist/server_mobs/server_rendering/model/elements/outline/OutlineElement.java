@@ -5,5 +5,6 @@ import com.slimeist.server_mobs.server_rendering.model.elements.IBakedModelPart;
 
 public interface OutlineElement {
     String getUUID();
+
     IBakedModelPart bake(UnbakedServerEntityModel unbakedServerEntityModel);
 }

@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public class CommandUtils {
     public static int playSound(Collection<ServerPlayerEntity> targets, Identifier sound, SoundCategory category, Vec3d pos, float volume, float pitch, float minVolume) {
-        double d = Math.pow(volume > 1.0f ? (double)(volume * 16.0f) : 16.0, 2.0);
+        double d = Math.pow(volume > 1.0f ? (double) (volume * 16.0f) : 16.0, 2.0);
         int i = 0;
         for (ServerPlayerEntity serverPlayerEntity : targets) {
             double e = pos.x - serverPlayerEntity.getX();

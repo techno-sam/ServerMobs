@@ -1,9 +1,6 @@
 package com.slimeist.server_mobs.mixin;
 
 import eu.pb4.polymer.api.block.PolymerBlockUtils;
-import eu.pb4.polymer.api.client.PolymerClientUtils;
-import eu.pb4.polymer.api.networking.PolymerPacketUtils;
-import eu.pb4.polymer.api.networking.PolymerSyncUtils;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BambooBlock;
 import net.minecraft.block.BlockState;
@@ -24,7 +21,7 @@ public class BambooBlockMixin {
     @Inject(at = @At("RETURN"), method = "updateLeaves")
     private void updateLeavesPost(BlockState state, World world, BlockPos pos, Random random, int height, CallbackInfo ci) {
         if (world instanceof ServerWorld serverWorld) {
-            for (BlockPos blockPos : new BlockPos[] {pos, pos.up()}) {
+            for (BlockPos blockPos : new BlockPos[]{pos, pos.up()}) {
                 BlockState upState = world.getBlockState(blockPos);
                 for (ServerPlayerEntity player : PlayerLookup.tracking(serverWorld, blockPos)) {
                     BlockState clientState = PolymerBlockUtils.getPolymerBlockState(upState, player);

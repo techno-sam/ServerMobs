@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.server_rendering.model.elements.ModelBox;
 import com.slimeist.server_mobs.server_rendering.model.elements.ModelGroup;
@@ -15,18 +14,12 @@ import eu.pb4.polymer.api.resourcepack.PolymerRPBuilder;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
-import net.minecraft.resource.LifecycledResourceManager;
-import net.minecraft.resource.Resource;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
 /*
@@ -61,7 +54,7 @@ public class ServerEntityModelLoader {
     public ServerEntityModelLoader(EntityType<?> entityType, String model_name_override, boolean doDamageTint) {
         this.entityType = entityType;
         this.doDamageTint = doDamageTint;
-        if (model_name_override!=null) {
+        if (model_name_override != null) {
             model_name_override = model_name_override.replace("..", "");
         }
         this.model_name_override = model_name_override;
@@ -82,7 +75,7 @@ public class ServerEntityModelLoader {
         Identifier id = Registry.ENTITY_TYPE.getId(entityType);
         String texture_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + id.getPath() + ".png";
         String texture_tint_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + id.getPath() + "_tint.png";
-        String model_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + (this.model_name_override==null ? id.getPath() + ".bbmodel" : this.model_name_override);
+        String model_loc_in = "assets/" + id.getNamespace() + "/server_entities/" + id.getPath() + "/" + (this.model_name_override == null ? id.getPath() + ".bbmodel" : this.model_name_override);
         String texture_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + ".png";
         String texture_tint_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + "_tint.png";
         String model_loc_out = "assets/" + id.getNamespace() + "/models/entity/" + id.getPath() + "/";
@@ -101,7 +94,7 @@ public class ServerEntityModelLoader {
         ModelBox hitbox = this.bakedModel.base().getChild("hitbox").boxes[0];
         Vec3f hitboxSize = hitbox.to().copy();
         hitboxSize.subtract(hitbox.from());
-        ServerMobsMod.LOGGER.info("Entity "+id+" hitbox:\n\tWidth: "+((hitboxSize.getX()+hitboxSize.getZ())/32)+"\n\tHeight: "+hitboxSize.getY()/16);
+        ServerMobsMod.LOGGER.info("Entity " + id + " hitbox:\n\tWidth: " + ((hitboxSize.getX() + hitboxSize.getZ()) / 32) + "\n\tHeight: " + hitboxSize.getY() / 16);
         try {
             createItemModel(builder, model_loc_out, this.bakedModel.base().getChild("base"));
         } catch (IOException e) {
@@ -124,18 +117,18 @@ public class ServerEntityModelLoader {
 
     private Vec3f div(Vec3f a, double divisor) {
         Vec3f tmp = a.copy();
-        tmp.scale((float) (1.0f/divisor));
+        tmp.scale((float) (1.0f / divisor));
         return tmp;
     }
 
     private Vec3f max(@Nullable Vec3f a, Vec3f b) {
-        if (a==null)
+        if (a == null)
             a = b;
         return new Vec3f(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ()));
     }
 
     private Vec3f min(@Nullable Vec3f a, Vec3f b) {
-        if (a==null)
+        if (a == null)
             a = b;
         return new Vec3f(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY()), Math.min(a.getZ(), b.getZ()));
     }
@@ -176,14 +169,14 @@ public class ServerEntityModelLoader {
 
 
             if (!ScaleUtils.standSize(ScaleUtils.scaleAmount(minCoord, maxCoord)).valid) {
-                ServerMobsMod.LOGGER.error("Item model for "+baseLoc+" is too big, try moving pivot point. (The model must not extend beyond -40 or 80 in all axes)");
+                ServerMobsMod.LOGGER.error("Item model for " + baseLoc + " is too big, try moving pivot point. (The model must not extend beyond -40 or 80 in all axes)");
             }
         }
 
         double extra_scaling;
         ScaleUtils.Scale stand_scale;
         // If there were no boxes
-        if (minCoord==null || maxCoord==null) {
+        if (minCoord == null || maxCoord == null) {
             extra_scaling = 1;
             stand_scale = ScaleUtils.Scale.SMALL;
             //ServerMobsMod.LOGGER.warn("Defaulting to small because no boxes were found for "+id+", "+model_file_name+", minCoord: "+minCoord+", maxCoord: "+maxCoord);
@@ -259,13 +252,13 @@ public class ServerEntityModelLoader {
             JsonObject display = new JsonObject();
             //ServerMobsMod.LOGGER.warn("Loading display");
             {
-                double s = ScaleUtils.getScaling(stand_scale)*extra_scaling;//(1.6/0.7); //the 0.7 is if using baby armor stands
+                double s = ScaleUtils.getScaling(stand_scale) * extra_scaling;//(1.6/0.7); //the 0.7 is if using baby armor stands
                 JsonObject head = new JsonObject();
                 {
                     JsonArray translation = new JsonArray();
-                    translation.add(8*s);
-                    translation.add((8*s) - (4*ScaleUtils.getScaling(stand_scale)));// - (4*s));
-                    translation.add(8*s);
+                    translation.add(8 * s);
+                    translation.add((8 * s) - (4 * ScaleUtils.getScaling(stand_scale)));// - (4*s));
+                    translation.add(8 * s);
                     head.add("translation", translation);
                 }
                 {
@@ -288,7 +281,7 @@ public class ServerEntityModelLoader {
         }
         if (this.doDamageTint) {
             JsonObject textures = new JsonObject();
-            textures.addProperty("0", id.getNamespace() + ":entity/" + id.getPath()+"_tint");
+            textures.addProperty("0", id.getNamespace() + ":entity/" + id.getPath() + "_tint");
             tint_model.add("textures", textures);
         }
 

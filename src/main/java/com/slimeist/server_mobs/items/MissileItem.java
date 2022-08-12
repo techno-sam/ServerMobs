@@ -1,7 +1,6 @@
 package com.slimeist.server_mobs.items;
 
 import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.util.CommandUtils;
 import com.slimeist.server_mobs.entities.MissileEntity;
 import eu.pb4.polymer.api.item.SimplePolymerItem;
 import net.minecraft.client.item.TooltipContext;
@@ -11,16 +10,13 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.item.FireworkRocketItem;
 import net.minecraft.item.FireworkStarItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.*;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -34,6 +30,7 @@ import java.util.List;
 
 public class MissileItem extends SimplePolymerItem implements CustomModelItem {
     private int customModelData;
+
     public MissileItem(Settings settings, Item polymerItem) {
         this(settings, polymerItem, -1);
     }
@@ -49,7 +46,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
         Vec3d rot = source.getRotationVec(0);
         Box box = source.getBoundingBox().stretch(rot.multiply(distance)).expand(1.0, 1.0, 1.0);
         boolean targetMissiles = false;
-        EntityHitResult entityResult = ProjectileUtil.raycast(source, start, start.add(rot.x * distance, rot.y * distance, rot.z * distance), box, e -> !e.isSpectator() && e.collides() && (!e.getType().equals(ServerMobsMod.MISSILE) || targetMissiles), distance*distance);
+        EntityHitResult entityResult = ProjectileUtil.raycast(source, start, start.add(rot.x * distance, rot.y * distance, rot.z * distance), box, e -> !e.isSpectator() && e.collides() && (!e.getType().equals(ServerMobsMod.MISSILE) || targetMissiles), distance * distance);
         if (entityResult != null && entityResult.getEntity() != null && !entityResult.getEntity().isSpectator() && entityResult.getEntity().isAlive()) {
             return entityResult;
         } else {
@@ -89,13 +86,13 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
             MissileEntity missile = MissileEntity.targeting(world, user, entityHitResult.getEntity());
             Vec3d newPos = missile.getPos().add(user.getRotationVector().normalize());
             missile.setPos(newPos.x, newPos.y, newPos.z);
-            missile.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1/3f, 0.0F);
+            missile.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1 / 3f, 0.0F);
 
             if (stack.hasNbt()) {
                 NbtCompound explosionData = stack.getSubNbt("Explosion");
                 if (explosionData != null) {
                     int[] colors = explosionData.getIntArray("Colors");
-                    if (colors.length>0) {
+                    if (colors.length > 0) {
                         int[] fadeColors = explosionData.getIntArray("FadeColors");
                         missile.setColorData(colors, fadeColors);
                         missile.setLaunchStack(stack.copy());
@@ -104,7 +101,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
             }
 
             if (false) {
-                ServerMobsMod.LOGGER.info("Missile fired at entity "+entityHitResult.getEntity().getName().getString());
+                ServerMobsMod.LOGGER.info("Missile fired at entity " + entityHitResult.getEntity().getName().getString());
                 String launchText = "Launched by " + user.getName().asString() + ", in direction:\n\tPitch: " + user.getPitch() + "\n\tYaw: " + user.getYaw();
                 ServerMobsMod.LOGGER.info(launchText);
             }

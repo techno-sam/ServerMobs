@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SimpleCustomModelItem extends SimplePolymerItem implements CustomModelItem {
     private int customModelData;
+
     public SimpleCustomModelItem(Settings settings, Item polymerItem) {
         this(settings, polymerItem, -1);
     }

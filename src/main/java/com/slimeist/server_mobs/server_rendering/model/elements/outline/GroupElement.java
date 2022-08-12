@@ -1,7 +1,6 @@
 package com.slimeist.server_mobs.server_rendering.model.elements.outline;
 
 import com.google.gson.*;
-import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
 import com.slimeist.server_mobs.server_rendering.model.UnbakedServerEntityModel;
 import com.slimeist.server_mobs.server_rendering.model.elements.ModelBox;

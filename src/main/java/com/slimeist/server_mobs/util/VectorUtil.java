@@ -1,6 +1,5 @@
 package com.slimeist.server_mobs.util;
 
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 
@@ -20,9 +19,9 @@ public class VectorUtil {
     }
 
     public static Vec3f fireworkColor(int rgbHex) {
-        float r = (float)((rgbHex & 0xFF0000) >> 16) / 255.0f;
-        float g = (float)((rgbHex & 0xFF00) >> 8) / 255.0f;
-        float b = (float)((rgbHex & 0xFF)) / 255.0f;
+        float r = (float) ((rgbHex & 0xFF0000) >> 16) / 255.0f;
+        float g = (float) ((rgbHex & 0xFF00) >> 8) / 255.0f;
+        float b = (float) ((rgbHex & 0xFF)) / 255.0f;
         return new Vec3f(r, g, b);
     }
 }

@@ -41,7 +41,8 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
         protected float rotation_amt = 0;
         protected Direction.Axis rotation_axis = Direction.Axis.X;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         public Builder(ModelBox box) {
             name = box.name;
@@ -180,7 +181,7 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
                     float rotation_amt = 0;
                     Direction.Axis axis = null;
                     for (float v : new float[]{x, y, z}) {
-                        if (v!=0) {
+                        if (v != 0) {
                             non_zero++;
                             rotation_amt = v;
                             axis = Direction.Axis.values()[index];
@@ -189,14 +190,14 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
                     }
 
                     if (non_zero == 1) {
-                        if (rotation_amt==-45f || rotation_amt==-22.5f || rotation_amt==0f || rotation_amt==22.5f || rotation_amt==45f) {
+                        if (rotation_amt == -45f || rotation_amt == -22.5f || rotation_amt == 0f || rotation_amt == 22.5f || rotation_amt == 45f) {
                             builder.setRotationAmount(rotation_amt);
                             builder.setRotationAxis(axis);
                         } else {
-                            ServerMobsMod.LOGGER.error("Loading element with name "+builder.getName()+", rotation "+rotation_amt+" invalid for axis "+axis.getName());
+                            ServerMobsMod.LOGGER.error("Loading element with name " + builder.getName() + ", rotation " + rotation_amt + " invalid for axis " + axis.getName());
                         }
                     } else if (non_zero != 0) {
-                        ServerMobsMod.LOGGER.error("Loading element with name "+builder.getName()+", can only rotate in one axis");
+                        ServerMobsMod.LOGGER.error("Loading element with name " + builder.getName() + ", can only rotate in one axis");
                     }
                 }
             }

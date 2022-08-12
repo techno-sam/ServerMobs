@@ -114,7 +114,7 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
 
     @Override
     protected boolean canPlace(ItemPlacementContext context, BlockState state) {
-        return getTarget(context.getStack(), context.getWorld())==null && super.canPlace(context, state);
+        return getTarget(context.getStack(), context.getWorld()) == null && super.canPlace(context, state);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
 
     static TranslatableText expirationText(ItemStack stack, World world) {
         int ticks = (int) (getExpiration(stack) - world.getTime());
-        int raw_seconds = ticks/20;
+        int raw_seconds = ticks / 20;
 
         if (raw_seconds <= 60)
             return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.seconds", str(raw_seconds));
@@ -184,7 +184,7 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
         if (world instanceof ServerWorld) {
             if (!isExpired(stack, world)) {
                 NbtCompound nbt = stack.getOrCreateSubNbt("CrocodileTarget");
-                int ste = (int) (getExpiration(stack)-world.getTime()) / 20;
+                int ste = (int) (getExpiration(stack) - world.getTime()) / 20;
                 if (!nbt.contains("ste", NbtElement.INT_TYPE) || nbt.getInt("ste") != ste) {
                     nbt.putInt("ste", ste);
                 }

@@ -4,7 +4,6 @@ import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
 import com.slimeist.server_mobs.server_rendering.model.ScaleUtils;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
-import net.minecraft.util.math.Vec3f;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class ModelGroup implements IBakedModelPart {
         ArrayList<String> names = new ArrayList<>();
         Arrays.stream(this.childGroups).forEach((modelGroup -> {
             if (names.contains(modelGroup.name)) {
-                ServerMobsMod.LOGGER.warn("Duplicate name: "+modelGroup.name);
+                ServerMobsMod.LOGGER.warn("Duplicate name: " + modelGroup.name);
             }
             names.add(modelGroup.name);
         }));

@@ -6,11 +6,7 @@ import com.slimeist.server_mobs.ServerMobsMod;
 import com.slimeist.server_mobs.mixin.EntityAccessor;
 import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
-import eu.pb4.holograms.HologramAPIMod;
-import eu.pb4.holograms.api.Holograms;
-import eu.pb4.holograms.utils.HologramHelper;
 import eu.pb4.polymer.api.entity.PolymerEntity;
-import net.fabricmc.fabric.impl.event.interaction.InteractionEventsRouter;
 import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -93,7 +89,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
     @Override
     public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() && this.isTouchingWater()) {
-            boolean slowUp = this.world.getFluidState(this.getBlockPos().up(1)).isOf(Fluids.EMPTY) && this.getVelocity().getY()>0.15 && false;
+            boolean slowUp = this.world.getFluidState(this.getBlockPos().up(1)).isOf(Fluids.EMPTY) && this.getVelocity().getY() > 0.15 && false;
 
             Vec3d velMul = new Vec3d(1, slowUp ? 0.6 : 1, 1); //prevent wild bobbing out of the water
 
@@ -107,7 +103,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
 
     @Override
     protected boolean isImmobile() {
-        return super.isImmobile() || this.stunTicks>0;
+        return super.isImmobile() || this.stunTicks > 0;
     }
 
     @Override
@@ -120,7 +116,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
 
     @Override
     protected void knockback(LivingEntity target) {
-        if (this.random.nextDouble()<0.3) {
+        if (this.random.nextDouble() < 0.3) {
             this.stunTicks = 25 + this.random.nextInt(15);
             this.playSound(SoundEvents.ENTITY_RAVAGER_STUNNED, 1.0f, 1.0f);
             target.pushAwayFrom(this);
@@ -179,7 +175,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         if (entity.getEquippedStack(EquipmentSlot.HEAD).isOf(ServerMobsMod.CROCODILE_HEAD)) {
             div = 2;
         }
-        return this.getBoundingBox().expand(entity.isTouchingWater() ? 12.0d/div : 7.0d/div).intersects(entity.getBoundingBox());
+        return this.getBoundingBox().expand(entity.isTouchingWater() ? 12.0d / div : 7.0d / div).intersects(entity.getBoundingBox());
     }
 
     public static DefaultAttributeContainer.Builder createCrocodileAttributes() {
@@ -244,7 +240,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
             ));
         }
 
-        if (this.stunTicks>0) {
+        if (this.stunTicks > 0) {
             --this.stunTicks;
             this.spawnStunnedParticles();
         }
@@ -260,7 +256,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
                 float innerAngle = (0.01745329251F * (this.bodyYaw + age * 5) * (i + 1));
                 double extraX = 0.5F * MathHelper.sin((float) (Math.PI + innerAngle));
                 double extraZ = 0.5F * MathHelper.cos(innerAngle);
-                serverWorld.spawnParticles(ParticleTypes.CRIT, x+extraX, y, z+extraZ, 0, 0, 0, 0, 0);
+                serverWorld.spawnParticles(ParticleTypes.CRIT, x + extraX, y, z + extraZ, 0, 0, 0, 0, 0);
             }
         }
     }
@@ -508,7 +504,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
 
         @Override
         public boolean canStart() {
-            if (CrocodileEntity.this.stunTicks>0) {
+            if (CrocodileEntity.this.stunTicks > 0) {
                 return false;
             }
             LivingEntity target = CrocodileEntity.this.getTarget();
@@ -718,7 +714,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         }
 
         private boolean crocValid() {
-            return CrocodileEntity.this.isOnGround() && !CrocodileEntity.this.world.getFluidState(CrocodileEntity.this.getBlockPos()).isIn(FluidTags.WATER) && CrocodileEntity.this.getTarget()==null;
+            return CrocodileEntity.this.isOnGround() && !CrocodileEntity.this.world.getFluidState(CrocodileEntity.this.getBlockPos()).isIn(FluidTags.WATER) && CrocodileEntity.this.getTarget() == null;
         }
 
         @Override
@@ -746,7 +742,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
 
         @Override
         public boolean shouldContinue() {
-            return !CrocodileEntity.this.navigation.isIdle() && targetPos!=null && crocValid();
+            return !CrocodileEntity.this.navigation.isIdle() && targetPos != null && crocValid();
         }
 
         @Nullable
@@ -754,8 +750,8 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
             BlockPos blockpos = null;
             final Random random = new Random();
             final int range = 45;
-            for(int i = 0; i < 15; i++) {
-                BlockPos blockPos = CrocodileEntity.this.getBlockPos().add(random.nextInt(range) - range/2, 3, random.nextInt(range) - range/2);
+            for (int i = 0; i < 15; i++) {
+                BlockPos blockPos = CrocodileEntity.this.getBlockPos().add(random.nextInt(range) - range / 2, 3, random.nextInt(range) - range / 2);
                 while (CrocodileEntity.this.world.isAir(blockPos) && blockPos.getY() > 1) {
                     blockPos = blockPos.down();
                 }

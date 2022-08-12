@@ -1,7 +1,6 @@
 package com.slimeist.server_mobs.entities;
 
 import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.mixin.FireworkRocketEntityAccessor;
 import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
 import com.slimeist.server_mobs.util.VectorUtil;
@@ -22,7 +21,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.EulerAngle;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
@@ -158,7 +160,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     private Vec3d normalize(Vec3d in) {
         Vec3d tmp = new Vec3d(in.getX(), in.getY(), in.getZ());
         double biggest = Math.max(Math.abs(tmp.getX()), Math.max(Math.abs(tmp.getY()), Math.abs(tmp.getZ())));
-        tmp.multiply(1/biggest);
+        tmp.multiply(1 / biggest);
         return tmp;
     }
 
@@ -203,7 +205,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
                     Vec3d m = getVelocity();
                     Vec3f fromCol = VectorUtil.fireworkColor(colorData.colors()[random.nextInt(colorData.colors().length)]);
                     Vec3f toCol = fromCol;
-                    if (colorData.fadeColors().length>0) {
+                    if (colorData.fadeColors().length > 0) {
                         toCol = VectorUtil.fireworkColor(colorData.fadeColors()[random.nextInt(colorData.fadeColors().length)]);
                     }
                     serverWorld.spawnParticles(new DustColorTransitionParticleEffect(fromCol, toCol, 4.0f), getX(), getY(), getZ(), 0, -m.x / 2, -m.y / 2, -m.z / 2, 1);
@@ -221,7 +223,6 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
         }
         this.getModelInstance().updateHologram();
     }
-
 
 
     @Override
@@ -313,8 +314,8 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
         this.setVelocity(x, y, z);
 
         float f1 = MathHelper.sqrt((float) (x * x + z * z));
-        this.setYaw((float)(MathHelper.atan2(x, z) * (180D / Math.PI)));
-        this.setPitch((float)(MathHelper.atan2(y, f1) * (180D / Math.PI)));
+        this.setYaw((float) (MathHelper.atan2(x, z) * (180D / Math.PI)));
+        this.setPitch((float) (MathHelper.atan2(y, f1) * (180D / Math.PI)));
         this.prevYaw = this.getYaw();
         this.prevPitch = this.getPitch();
     }

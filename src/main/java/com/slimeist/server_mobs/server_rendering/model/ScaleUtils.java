@@ -6,6 +6,7 @@ import net.minecraft.util.math.Vec3f;
 public class ScaleUtils {
 
     public static final double mc_max_extent = 48; //-16 to 32
+
     public static double getScaling(Scale stand_size) {
         return 1.6 / (stand_size.small ? 0.7 : 1);
     }
@@ -55,7 +56,7 @@ public class ScaleUtils {
     }
 
     public static double maxScale(Scale stand_size) {
-        return 4/getScaling(stand_size);
+        return 4 / getScaling(stand_size);
     }
 
     public static Scale standSize(double scale_amount) {
@@ -64,7 +65,7 @@ public class ScaleUtils {
         } else if (scale_amount <= maxScale(Scale.BIG)) {
             return Scale.BIG;
         } else {
-            ServerMobsMod.LOGGER.error("IMPOSSIBLE because size "+scale_amount+" exceeds maximum "+maxScale(Scale.BIG));
+            ServerMobsMod.LOGGER.error("IMPOSSIBLE because size " + scale_amount + " exceeds maximum " + maxScale(Scale.BIG));
             return Scale.IMPOSSIBLE;
         }
     }
@@ -130,6 +131,7 @@ public class ScaleUtils {
 
         public final boolean small;
         public final boolean valid;
+
         private Scale(boolean small, boolean valid) {
             this.small = small;
             this.valid = valid;

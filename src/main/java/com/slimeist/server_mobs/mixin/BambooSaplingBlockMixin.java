@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BambooSaplingBlock.class)
 public class BambooSaplingBlockMixin {
-    @Inject(method="getStateForNeighborUpdate", at=@At("RETURN"))
+    @Inject(method = "getStateForNeighborUpdate", at = @At("RETURN"))
     public void inject_state(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> cir) {
         if (direction == Direction.UP && neighborState.isOf(ServerMobsMod.CROCODILE_FLUTE_BLOCK)) {
             world.setBlockState(pos, Blocks.BAMBOO.getDefaultState(), Block.NOTIFY_LISTENERS);

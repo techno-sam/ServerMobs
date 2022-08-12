@@ -20,7 +20,10 @@ import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Optional;
 
 public record BakedServerEntityModel(int texWidth, int texHeight,
                                      ModelGroup base, boolean forceMarker) {
@@ -68,7 +71,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         @Nullable
         private String getPath(ModelGroup group) {
             ModelDisplayPiece piece = this.displayPieces.get(group);
-            return piece==null ? null : piece.path;
+            return piece == null ? null : piece.path;
         }
 
         private ItemStack createDisplayStack(ModelGroup group, boolean damageFlash) {
@@ -94,7 +97,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 return;
             }
             if (group == null) {
-                ServerMobsMod.LOGGER.warn("Failed to create armor stand for path "+modelPath+" because that path does not exist.");
+                ServerMobsMod.LOGGER.warn("Failed to create armor stand for path " + modelPath + " because that path does not exist.");
                 return;
             } else {
                 // ServerMobsMod.LOGGER.info("Creating armor stand for path ["+modelPath+"].");
@@ -114,7 +117,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             ArmorStandHologramElement element = new ArmorStandHologramElement(armorStand, true);
             Vec3d pivot = VectorUtil.toVec3d(group.transform.pivotVec());
             Vec3d base_offset = new Vec3d(0, group.getArmorStandScale().small ? (-0.645) : (-1.4385), 0); //was +0.171875
-            element.setOffset(base_offset.add(pivot.multiply(1/16.0d).multiply(-1, 1, -1))); //123456789
+            element.setOffset(base_offset.add(pivot.multiply(1 / 16.0d).multiply(-1, 1, -1))); //123456789
             int id = this.hologram.addElement(element);
             ModelDisplayPiece displayPiece = new ModelDisplayPiece(armorStand, id, VectorUtil.toVec3d(group.transform.pivotVec()), base_offset, modelPath);
             this.displayPieces.put(group, displayPiece);
@@ -137,7 +140,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 for (String name : group.getChildNames()) {
                     out.add(name);
                     ArrayList<String> childPaths = getChildPaths(group.getChild(name));
-                    childPaths.forEach((childName) -> out.add(name+"."+childName));
+                    childPaths.forEach((childName) -> out.add(name + "." + childName));
                 }
             }
             return out;
@@ -157,7 +160,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             String[] pieces = path.split("\\.");
             if (pieces.length > 1) {
                 StringBuilder parentPath = new StringBuilder("base");
-                for (int i = 1; i < pieces.length-1; i++) {
+                for (int i = 1; i < pieces.length - 1; i++) {
                     parentPath.append(".").append(pieces[i]);
                 }
                 return Optional.of(parentPath.toString());
@@ -200,7 +203,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
         }
 
         private static EulerAngle add(EulerAngle a, EulerAngle b) {
-            return new EulerAngle(a.getPitch()+b.getPitch(), a.getYaw()+b.getYaw(), a.getRoll()+b.getRoll());
+            return new EulerAngle(a.getPitch() + b.getPitch(), a.getYaw() + b.getYaw(), a.getRoll() + b.getRoll());
         }
 
         protected void updateParenting(ModelGroup part) {
@@ -267,7 +270,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             if (part == null) {
                 return false;
             }
-            if (getPartDebug(path)!=debug) {
+            if (getPartDebug(path) != debug) {
                 this.markDirty();
             }
             this.displayPieces.get(part).armorStand.setInvisible(debug);
@@ -287,7 +290,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             if (part == null) {
                 return false;
             }
-            if (getPartParentLocal(path)!=parentLocal) {
+            if (getPartParentLocal(path) != parentLocal) {
                 this.markDirty();
             }
             ModelDisplayPiece piece = this.displayPieces.get(part);
@@ -390,7 +393,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             if (!livingEntity.isAlive()) {
                 this.setDamageFlash(true, invisible);
             } else {
-                this.setDamageFlash(livingEntity.hurtTime>0, invisible);
+                this.setDamageFlash(livingEntity.hurtTime > 0, invisible);
             }
         }
 
@@ -406,7 +409,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             public EulerAngle relativeRotation;
 
             public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path) {
-                this(armorStand, elementID, pivot, base_offset, path, null,false);
+                this(armorStand, elementID, pivot, base_offset, path, null, false);
             }
 
             public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path, Vec3d parentRelativePivot, boolean parentLocalMovement) {
@@ -423,7 +426,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
 
             public void applyOffset(EntityHologram hologram) {
                 if (this.getElement(hologram) instanceof ArmorStandHologramElement armorStandHologramElement) {
-                    armorStandHologramElement.setOffset(this.base_offset.add(this.pivot.multiply(1/16.0d).multiply(-1, 1, -1))); //123456789
+                    armorStandHologramElement.setOffset(this.base_offset.add(this.pivot.multiply(1 / 16.0d).multiply(-1, 1, -1))); //123456789
                 }
             }
 

@@ -1,7 +1,6 @@
 package com.slimeist.server_mobs.entities;
 
 import com.slimeist.server_mobs.mixin.EntityAccessor;
-import com.slimeist.server_mobs.mixin.SnowGolemEntityAccessor;
 import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
 import eu.pb4.holograms.mixin.accessors.SlimeEntityAccessor;
@@ -18,7 +17,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -63,13 +61,13 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
 
     @Override
     public void updateAngles() {
-        this.getModelInstance().setPartRotation("base.top_spin", new EulerAngle(0, (360*(this.age/(20*5f)))%360, 0));
+        this.getModelInstance().setPartRotation("base.top_spin", new EulerAngle(0, (360 * (this.age / (20 * 5f))) % 360, 0));
         if (this.isAttacking()) {
             this.getModelInstance().setPartRotation("base.middle_spin", new EulerAngle(0, (360 * (this.age / (20 * 3.5f))) % 360, 0));
         } else {
             this.getModelInstance().setPartRotation("base.middle_spin", new EulerAngle(0, -(360 * (this.age / (20 * 2.5f))) % 360, 0));
         }
-        this.getModelInstance().setPartRotation("base.bottom_spin", new EulerAngle(0, (360*(this.age/(20*1.25f)))%360, 0));
+        this.getModelInstance().setPartRotation("base.bottom_spin", new EulerAngle(0, (360 * (this.age / (20 * 1.25f))) % 360, 0));
 
         this.getModelInstance().handleDamageFlash(this);
     }
@@ -88,9 +86,9 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
     protected static byte modifyFlag(byte flag, int index, boolean value) {
         byte out;
         if (value) {
-            out = (byte)(flag | 1 << index);
+            out = (byte) (flag | 1 << index);
         } else {
-            out = (byte)(flag & ~(1 << index));
+            out = (byte) (flag & ~(1 << index));
         }
         return out;
     }
@@ -135,7 +133,7 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
 
     @Override
     protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
-        return dimensions.height*0.75f;
+        return dimensions.height * 0.75f;
     }
 
     @Override
