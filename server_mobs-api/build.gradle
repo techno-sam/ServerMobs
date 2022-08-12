@@ -1,5 +1,6 @@
 archivesBaseName = project.archives_base_name + "_api"
 group = rootProject.group
+version = project.api_version
 
 loom {
     accessWidenerPath = file("src/main/resources/server_mobs_api.accesswidener")

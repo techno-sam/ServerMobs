@@ -10,6 +10,7 @@ import eu.pb4.polymer.api.entity.PolymerEntity;
 import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.control.AquaticMoveControl;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.*;
@@ -28,6 +29,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
@@ -35,10 +37,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 //use HologramAPI for model display
@@ -122,8 +121,20 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         }
     }
 
+    private Optional<BlockPos> findNearestFlute() {
+        return BlockPos.findClosest(getBlockPos(), 8, 4, pos -> world.getBlockState((BlockPos)pos).isIn(ModBlockTags.CROCODILES_FEAR));
+    }
+
+    private boolean isFluteAround(BlockPos pos) {
+        Optional<BlockPos> optional = findNearestFlute();
+        return optional.isPresent() && optional.get().isWithinDistance(pos, 8.0);
+    }
+
     @Override
     public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (isFluteAround(pos)) {
+            return -1.0f;
+        }
         return 0.0f;
     }
 
