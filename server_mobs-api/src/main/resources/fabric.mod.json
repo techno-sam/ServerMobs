@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Server Mobs API",
-  "description": "Create mobs serverside",
+  "description": "Library to create mobs serverside - if you are looking for actual content, download ServerMobs",
   "authors": [
     "Slimeist"
   ],
@@ -13,7 +13,7 @@
     "sources": "https://github.com/techno-sam/ServerMobs"
   },
 
-  "license": "LGPL v3",
+  "license": "MIT",
   "icon": "assets/server_mobs_api/icon.png",
 
   "environment": "server",
@@ -39,5 +39,6 @@
   "recommends": {
     "server_translations_api": "*",
     "polypack_host": "*"
-  }
+  },
+  "accessWidener": "server_mobs_api.accesswidener"
 }

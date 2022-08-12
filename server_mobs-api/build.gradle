@@ -1,2 +1,17 @@
- archivesBaseName = "server_mobs_api"
- group = rootProject.group
+archivesBaseName = project.archives_base_name + "_api"
+group = rootProject.group
+
+loom {
+    accessWidenerPath = file("src/main/resources/server_mobs_api.accesswidener")
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}"}
+    }
+
+    exclude "**/*.xcf"
+    exclude "**/*sync-conflict*"
+    exclude "/tools"
+    exclude "**/unused"
+}

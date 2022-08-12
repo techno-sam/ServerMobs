@@ -21,6 +21,6 @@ The 'API' (not guaranteed to be stable yet) is under [com.slimeist.server_mobs.s
 
 ## License
 
-This project is available under the LGPL-3 license. It is based on the fabric example mod template which is available under the CC0 license.<br>
+This project is available under the MIT license. It is based on the fabric example mod template which is available under the CC0 license.<br>
 Marked sections of code inside [com.slimeist.server_mobs.entities.MissileEntity](src/main/java/com/slimeist/server_mobs/entities/MissileEntity.java) are from [Team Pneumatic's Pnematicraft Repressurized](https://github.com/TeamPneumatic/pnc-repressurized), and are licensed under the GPL-3 license.<br>
 Marked sections of code inside [com.slimeist.server_mobs.items.MissileItem](src/main/java/com/slimeist/server_mobs/items/MissileItem.java) are from [Team Pneumatic's Pnematicraft Repressurized](https://github.com/TeamPneumatic/pnc-repressurized), and are licensed under the GPL-3 license.
