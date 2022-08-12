@@ -35,11 +35,11 @@
     "polymer-blocks-ext": "*",
     "hologram-api": "*",
     "nbtcrafting": "*",
-    "server_mobs_api": "${api_version}",
-    "polypack_host": "*"
+    "server_mobs_api": "${api_version}"
   },
   "recommends": {
-    "server_translations_api": "*"
+    "server_translations_api": "*",
+    "polypack_host": "*"
   },
   "accessWidener" : "server_mobs.accesswidener"
 }

@@ -33,11 +33,11 @@
     "java": ">=17",
     "polymer": "*",
     "polymer-blocks-ext": "*",
-    "hologram-api": "*",
-    "polypack_host": "*"
+    "hologram-api": "*"
   },
   "recommends": {
-    "server_translations_api": "*"
+    "server_translations_api": "*",
+    "polypack_host": "*"
   },
   "accessWidener": "server_mobs_api.accesswidener"
 }
