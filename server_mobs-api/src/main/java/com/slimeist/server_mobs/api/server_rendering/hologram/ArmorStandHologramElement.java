@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs.server_rendering.hologram;
+package com.slimeist.server_mobs.api.server_rendering.hologram;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.holograms.api.InteractionType;
@@ -61,8 +61,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
         EntityTrackerUpdateS2CPacketAccessor accessor = (EntityTrackerUpdateS2CPacketAccessor) packet;
 
         accessor.setId(this.entity.getId());
-        List<DataTracker.Entry<?>> data = new ArrayList<>();
-        data.addAll(this.entity.getDataTracker().getAllEntries());
+        List<DataTracker.Entry<?>> data = new ArrayList<>(this.entity.getDataTracker().getAllEntries());
         data.add(new DataTracker.Entry<>(EntityAccessor.getNoGravity(), true));
         accessor.setTrackedValues(data);
 
@@ -102,8 +101,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
             EntityTrackerUpdateS2CPacketAccessor accessor = (EntityTrackerUpdateS2CPacketAccessor) packet;
 
             accessor.setId(this.entity.getId());
-            List<DataTracker.Entry<?>> data = new ArrayList<>();
-            data.addAll(this.entity.getDataTracker().getAllEntries());
+            List<DataTracker.Entry<?>> data = new ArrayList<>(this.entity.getDataTracker().getAllEntries());
             data.add(new DataTracker.Entry<>(EntityAccessor.getNoGravity(), true));
             accessor.setTrackedValues(data);
 

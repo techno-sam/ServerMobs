@@ -1,8 +1,8 @@
-package com.slimeist.server_mobs.server_rendering.model.elements;
+package com.slimeist.server_mobs.api.server_rendering.model.elements;
 
-import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.server_rendering.model.ModelTransform;
-import com.slimeist.server_mobs.server_rendering.model.ScaleUtils;
+import com.slimeist.server_mobs.api.ServerMobsApiMod;
+import com.slimeist.server_mobs.api.server_rendering.model.ModelTransform;
+import com.slimeist.server_mobs.api.server_rendering.model.ScaleUtils;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +48,7 @@ public class ModelGroup implements IBakedModelPart {
         ArrayList<String> names = new ArrayList<>();
         Arrays.stream(this.childGroups).forEach((modelGroup -> {
             if (names.contains(modelGroup.name)) {
-                ServerMobsMod.LOGGER.warn("Duplicate name: " + modelGroup.name);
+                ServerMobsApiMod.LOGGER.warn("Duplicate name: " + modelGroup.name);
             }
             names.add(modelGroup.name);
         }));

@@ -1,6 +1,6 @@
-package com.slimeist.server_mobs.server_rendering.model;
+package com.slimeist.server_mobs.api.server_rendering.model;
 
-import com.slimeist.server_mobs.ServerMobsMod;
+import com.slimeist.server_mobs.api.ServerMobsApiMod;
 import net.minecraft.util.math.Vec3f;
 
 public class ScaleUtils {
@@ -65,7 +65,7 @@ public class ScaleUtils {
         } else if (scale_amount <= maxScale(Scale.BIG)) {
             return Scale.BIG;
         } else {
-            ServerMobsMod.LOGGER.error("IMPOSSIBLE because size " + scale_amount + " exceeds maximum " + maxScale(Scale.BIG));
+            ServerMobsApiMod.LOGGER.error("IMPOSSIBLE because size " + scale_amount + " exceeds maximum " + maxScale(Scale.BIG));
             return Scale.IMPOSSIBLE;
         }
     }
@@ -132,7 +132,7 @@ public class ScaleUtils {
         public final boolean small;
         public final boolean valid;
 
-        private Scale(boolean small, boolean valid) {
+        Scale(boolean small, boolean valid) {
             this.small = small;
             this.valid = valid;
         }

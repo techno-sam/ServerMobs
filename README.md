@@ -8,7 +8,7 @@ At some point in the future, the non-API portion will be split into a separate m
 Don't forget to configure polypack_host if you use it.
 <br>
 Example entity implementations are under [com.slimeist.server_mobs.entities](src/main/java/com/slimeist/server_mobs/entities).
-The 'API' (not guaranteed to be stable yet) is under [com.slimeist.server_mobs.server_rendering](src/main/java/com/slimeist/server_mobs/server_rendering).
+The 'API' (not guaranteed to be stable yet) is under [com.slimeist.server_mobs.api](src/main/java/com/slimeist/server_mobs/server_rendering).
 
 ## Dependencies
 ### Required

@@ -1,6 +1,6 @@
-package com.slimeist.server_mobs.server_rendering.entity;
+package com.slimeist.server_mobs.api.server_rendering.entity;
 
-import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
+import com.slimeist.server_mobs.api.server_rendering.model.BakedServerEntityModel;
 
 public interface IServerRenderedEntity {
     BakedServerEntityModel.Instance createModelInstance();
@@ -14,8 +14,7 @@ public interface IServerRenderedEntity {
     default void initAngles() {
     }
 
-    ;
-
+    @SuppressWarnings("SameReturnValue")
     default String getNametagPath() {
         return "base";
     }

@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs.server_rendering.entity;
+package com.slimeist.server_mobs.api.server_rendering.entity;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

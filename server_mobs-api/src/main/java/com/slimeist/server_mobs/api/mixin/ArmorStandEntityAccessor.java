@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs.mixin;
+package com.slimeist.server_mobs.api.mixin;
 
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.util.math.EulerAngle;

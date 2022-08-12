@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs.util;
+package com.slimeist.server_mobs.api.util;
 
 import com.google.gson.JsonArray;
 import net.minecraft.util.math.Vec3f;

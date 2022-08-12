@@ -1,12 +1,13 @@
 /*
  * Decompiled with CFR 0.1.1 (FabricMC 57d88659).
  */
-package com.slimeist.server_mobs.server_rendering.model;
+package com.slimeist.server_mobs.api.server_rendering.model;
 
 import com.google.gson.JsonArray;
-import com.slimeist.server_mobs.util.JsonUtil;
+import com.slimeist.server_mobs.api.util.JsonUtil;
 import net.minecraft.util.math.Vec3f;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class ModelTransform {
     public static final ModelTransform NONE = ModelTransform.of(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     public final float pivotX;

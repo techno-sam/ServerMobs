@@ -1,9 +1,9 @@
 package com.slimeist.server_mobs.entities;
 
 import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
-import com.slimeist.server_mobs.server_rendering.model.BakedServerEntityModel;
-import com.slimeist.server_mobs.util.VectorUtil;
+import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntity;
+import com.slimeist.server_mobs.api.server_rendering.model.BakedServerEntityModel;
+import com.slimeist.server_mobs.api.util.VectorUtil;
 import eu.pb4.polymer.api.entity.PolymerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

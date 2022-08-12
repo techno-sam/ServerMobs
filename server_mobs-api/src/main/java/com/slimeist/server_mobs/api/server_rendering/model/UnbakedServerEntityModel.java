@@ -1,11 +1,11 @@
-package com.slimeist.server_mobs.server_rendering.model;
+package com.slimeist.server_mobs.api.server_rendering.model;
 
 import com.google.gson.*;
-import com.slimeist.server_mobs.server_rendering.model.elements.ModelBox;
-import com.slimeist.server_mobs.server_rendering.model.elements.ModelGroup;
-import com.slimeist.server_mobs.server_rendering.model.elements.outline.GroupElement;
-import com.slimeist.server_mobs.server_rendering.model.elements.outline.OutlineElement;
-import com.slimeist.server_mobs.server_rendering.model.elements.outline.SingleElement;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.ModelBox;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.ModelGroup;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.outline.GroupElement;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.outline.OutlineElement;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.outline.SingleElement;
 import net.minecraft.util.JsonHelper;
 
 import java.io.Reader;

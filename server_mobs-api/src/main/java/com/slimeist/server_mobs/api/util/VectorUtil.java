@@ -1,4 +1,4 @@
-package com.slimeist.server_mobs.util;
+package com.slimeist.server_mobs.api.util;
 
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;

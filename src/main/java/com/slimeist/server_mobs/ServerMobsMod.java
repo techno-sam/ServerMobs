@@ -6,7 +6,7 @@ import com.slimeist.server_mobs.entities.CrocodileEntity;
 import com.slimeist.server_mobs.entities.GustEntity;
 import com.slimeist.server_mobs.entities.MissileEntity;
 import com.slimeist.server_mobs.items.*;
-import com.slimeist.server_mobs.server_rendering.model.ServerEntityModelLoader;
+import com.slimeist.server_mobs.api.server_rendering.model.ServerEntityModelLoader;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.api.item.PolymerItem;
 import eu.pb4.polymer.api.resourcepack.PolymerArmorModel;

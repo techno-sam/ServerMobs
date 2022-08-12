@@ -1,11 +1,11 @@
-package com.slimeist.server_mobs.server_rendering.model.elements.outline;
+package com.slimeist.server_mobs.api.server_rendering.model.elements.outline;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.slimeist.server_mobs.server_rendering.model.UnbakedServerEntityModel;
-import com.slimeist.server_mobs.server_rendering.model.elements.IBakedModelPart;
+import com.slimeist.server_mobs.api.server_rendering.model.UnbakedServerEntityModel;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.IBakedModelPart;
 
 import java.lang.reflect.Type;
 

@@ -1,14 +1,14 @@
-package com.slimeist.server_mobs.server_rendering.model;
+package com.slimeist.server_mobs.api.server_rendering.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.server_rendering.model.elements.ModelBox;
-import com.slimeist.server_mobs.server_rendering.model.elements.ModelGroup;
-import com.slimeist.server_mobs.server_rendering.model.elements.ModelUV;
-import com.slimeist.server_mobs.util.JsonUtil;
+import com.slimeist.server_mobs.api.ServerMobsApiMod;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.ModelBox;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.ModelGroup;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.ModelUV;
+import com.slimeist.server_mobs.api.util.JsonUtil;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import eu.pb4.polymer.api.resourcepack.PolymerRPBuilder;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
@@ -19,7 +19,6 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /*
@@ -80,7 +79,7 @@ public class ServerEntityModelLoader {
         String texture_tint_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + "_tint.png";
         String model_loc_out = "assets/" + id.getNamespace() + "/models/entity/" + id.getPath() + "/";
 
-        builder.copyModAssets(ServerMobsMod.MOD_ID);
+        builder.copyModAssets(id.getNamespace());
 
         //copy texture
         builder.addData(texture_loc_out, builder.getData(texture_loc_in));
@@ -94,13 +93,8 @@ public class ServerEntityModelLoader {
         ModelBox hitbox = this.bakedModel.base().getChild("hitbox").boxes[0];
         Vec3f hitboxSize = hitbox.to().copy();
         hitboxSize.subtract(hitbox.from());
-        ServerMobsMod.LOGGER.info("Entity " + id + " hitbox:\n\tWidth: " + ((hitboxSize.getX() + hitboxSize.getZ()) / 32) + "\n\tHeight: " + hitboxSize.getY() / 16);
-        try {
-            createItemModel(builder, model_loc_out, this.bakedModel.base().getChild("base"));
-        } catch (IOException e) {
-            logInstructions();
-            ServerMobsMod.LOGGER.error(e.getLocalizedMessage());
-        }
+        ServerMobsApiMod.LOGGER.info("Entity " + id + " hitbox:\n\tWidth: " + ((hitboxSize.getX() + hitboxSize.getZ()) / 32) + "\n\tHeight: " + hitboxSize.getY() / 16);
+        createItemModel(builder, model_loc_out, this.bakedModel.base().getChild("base"));
     }
 
     private Vec3f sub(Vec3f a, Vec3f minus_b) {
@@ -133,7 +127,7 @@ public class ServerEntityModelLoader {
         return new Vec3f(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY()), Math.min(a.getZ(), b.getZ()));
     }
 
-    private void createItemModel(PolymerRPBuilder builder, String baseLoc, ModelGroup group) throws IOException {
+    private void createItemModel(PolymerRPBuilder builder, String baseLoc, ModelGroup group) {
         Identifier id = Registry.ENTITY_TYPE.getId(entityType);
         baseLoc += group.name + "/";
         for (ModelGroup child : group.childGroups) {
@@ -169,7 +163,7 @@ public class ServerEntityModelLoader {
 
 
             if (!ScaleUtils.standSize(ScaleUtils.scaleAmount(minCoord, maxCoord)).valid) {
-                ServerMobsMod.LOGGER.error("Item model for " + baseLoc + " is too big, try moving pivot point. (The model must not extend beyond -40 or 80 in all axes)");
+                ServerMobsApiMod.LOGGER.error("Item model for " + baseLoc + " is too big, try moving pivot point. (The model must not extend beyond -40 or 80 in all axes)");
             }
         }
 
@@ -184,7 +178,7 @@ public class ServerEntityModelLoader {
             extra_scaling = ScaleUtils.scaleAmount(minCoord, maxCoord);
             stand_scale = ScaleUtils.standSize(extra_scaling);
         }
-        stand_scale = ScaleUtils.Scale.BIG;
+        //stand_scale = ScaleUtils.Scale.BIG; //debug for something?
         group.setArmorStandScale(stand_scale);
 
         /*if (divide != 1) {
@@ -329,8 +323,8 @@ public class ServerEntityModelLoader {
 
     private void logInstructions() {
         Identifier id = Registry.ENTITY_TYPE.getId(entityType);
-        ServerMobsMod.LOGGER.warn("Missing proper datapack entry for entity " + id + ".");
-        ServerMobsMod.LOGGER.warn("In your mod data, create the files:\n\t" + id.getPath() + ".bbmodel\n\t" + id.getPath() + ".png\nin the folder:\n\tdata/" + id.getNamespace() + "/entities/" + id.getPath() + "/");
+        ServerMobsApiMod.LOGGER.warn("Missing proper datapack entry for entity " + id + ".");
+        ServerMobsApiMod.LOGGER.warn("In your mod data, create the files:\n\t" + id.getPath() + ".bbmodel\n\t" + id.getPath() + ".png\nin the folder:\n\tdata/" + id.getNamespace() + "/entities/" + id.getPath() + "/");
     }
 
     public BakedServerEntityModel getBakedModel() {

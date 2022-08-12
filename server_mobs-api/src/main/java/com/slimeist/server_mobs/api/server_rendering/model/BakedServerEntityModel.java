@@ -1,11 +1,11 @@
-package com.slimeist.server_mobs.server_rendering.model;
+package com.slimeist.server_mobs.api.server_rendering.model;
 
-import com.slimeist.server_mobs.ServerMobsMod;
-import com.slimeist.server_mobs.mixin.ArmorStandEntityAccessor;
-import com.slimeist.server_mobs.server_rendering.entity.IServerRenderedEntity;
-import com.slimeist.server_mobs.server_rendering.hologram.ArmorStandHologramElement;
-import com.slimeist.server_mobs.server_rendering.model.elements.ModelGroup;
-import com.slimeist.server_mobs.util.VectorUtil;
+import com.slimeist.server_mobs.api.ServerMobsApiMod;
+import com.slimeist.server_mobs.api.mixin.ArmorStandEntityAccessor;
+import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntity;
+import com.slimeist.server_mobs.api.server_rendering.hologram.ArmorStandHologramElement;
+import com.slimeist.server_mobs.api.server_rendering.model.elements.ModelGroup;
+import com.slimeist.server_mobs.api.util.VectorUtil;
 import eu.pb4.holograms.api.elements.HologramElement;
 import eu.pb4.holograms.api.holograms.EntityHologram;
 import eu.pb4.polymer.api.resourcepack.PolymerModelData;
@@ -97,11 +97,10 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 return;
             }
             if (group == null) {
-                ServerMobsMod.LOGGER.warn("Failed to create armor stand for path " + modelPath + " because that path does not exist.");
+                ServerMobsApiMod.LOGGER.warn("Failed to create armor stand for path " + modelPath + " because that path does not exist.");
                 return;
-            } else {
-                // ServerMobsMod.LOGGER.info("Creating armor stand for path ["+modelPath+"].");
-            }
+            }  // ServerMobsMod.LOGGER.info("Creating armor stand for path ["+modelPath+"].");
+
             ItemStack displayStack = createDisplayStack(group, false);
 
             ArmorStandEntity armorStand = new ArmorStandEntity(this.entity.getWorld(), this.entity.getX(), this.entity.getY(), this.entity.getZ());

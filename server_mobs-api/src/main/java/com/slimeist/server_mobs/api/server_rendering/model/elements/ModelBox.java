@@ -1,7 +1,7 @@
-package com.slimeist.server_mobs.server_rendering.model.elements;
+package com.slimeist.server_mobs.api.server_rendering.model.elements;
 
 import com.google.gson.*;
-import com.slimeist.server_mobs.ServerMobsMod;
+import com.slimeist.server_mobs.api.ServerMobsApiMod;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3f;
 
@@ -194,10 +194,10 @@ public record ModelBox(String name, Vec3f from, Vec3f to,
                             builder.setRotationAmount(rotation_amt);
                             builder.setRotationAxis(axis);
                         } else {
-                            ServerMobsMod.LOGGER.error("Loading element with name " + builder.getName() + ", rotation " + rotation_amt + " invalid for axis " + axis.getName());
+                            ServerMobsApiMod.LOGGER.error("Loading element with name " + builder.getName() + ", rotation " + rotation_amt + " invalid for axis " + axis.getName());
                         }
                     } else if (non_zero != 0) {
-                        ServerMobsMod.LOGGER.error("Loading element with name " + builder.getName() + ", can only rotate in one axis");
+                        ServerMobsApiMod.LOGGER.error("Loading element with name " + builder.getName() + ", can only rotate in one axis");
                     }
                 }
             }
