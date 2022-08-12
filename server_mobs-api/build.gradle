@@ -4,7 +4,7 @@ plugins {
 
 archivesBaseName = project.archives_base_name + "_api"
 group = rootProject.group
-version = project.api_version
+version = project.api_version + "+" + project.minecraft_version
 
 loom {
     accessWidenerPath = file("src/main/resources/server_mobs_api.accesswidener")
@@ -25,8 +25,8 @@ if (System.getenv("MODRINTH_TOKEN")) {
     modrinth {
         token = System.getenv("MODRINTH_TOKEN")
         projectId = "server_mobs_api"
-        versionNumber = "" + api_version
-        versionType = "alpha"
+        versionNumber = "" + version
+        versionType = "release"
         uploadFile = project.remapJar
         gameVersions = [((String) project.minecraft_version)]
         loaders = ["fabric"]
