@@ -15,7 +15,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
@@ -176,7 +177,7 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                         display.armorStand.setCustomName(this.entity.getDisplayName());
                         display.armorStand.setCustomNameVisible(this.entity.hasCustomName());
                     } else {
-                        display.armorStand.setCustomName(LiteralText.EMPTY);
+                        display.armorStand.setCustomName(Text.empty());
                         display.armorStand.setCustomNameVisible(false);
                     }
                 });

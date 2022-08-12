@@ -26,6 +26,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.tag.BiomeTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -185,7 +186,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 
         CrocodileEntity.registerSpawnRestrictions(CROCODILE);
         BiomeModifications.addSpawn(
-                biomeSelectionContext -> Biome.getCategory(biomeSelectionContext.getBiomeRegistryEntry()).equals(Biome.Category.SWAMP),
+                biomeSelectionContext -> biomeSelectionContext.getBiomeRegistryEntry().isIn(BiomeTags.ALLOWS_SURFACE_SLIME_SPAWNS),
                 CROCODILE.getSpawnGroup(),
                 CROCODILE,
                 12,

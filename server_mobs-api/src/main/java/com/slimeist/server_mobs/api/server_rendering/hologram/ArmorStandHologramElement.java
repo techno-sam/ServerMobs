@@ -4,10 +4,9 @@ import com.mojang.datafixers.util.Pair;
 import eu.pb4.holograms.api.InteractionType;
 import eu.pb4.holograms.api.elements.AbstractHologramElement;
 import eu.pb4.holograms.api.holograms.AbstractHologram;
+import eu.pb4.holograms.impl.HologramHelper;
 import eu.pb4.holograms.mixin.accessors.EntityAccessor;
 import eu.pb4.holograms.mixin.accessors.EntityTrackerUpdateS2CPacketAccessor;
-import eu.pb4.holograms.utils.HologramHelper;
-import eu.pb4.holograms.utils.PacketHelpers;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -57,7 +56,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
 
         player.networkHandler.sendPacket(this.entity.createSpawnPacket());
 
-        EntityTrackerUpdateS2CPacket packet = PacketHelpers.createEntityTrackerUpdate();
+        EntityTrackerUpdateS2CPacket packet = HologramHelper.createUnsafe(EntityTrackerUpdateS2CPacket.class);
         EntityTrackerUpdateS2CPacketAccessor accessor = (EntityTrackerUpdateS2CPacketAccessor) packet;
 
         accessor.setId(this.entity.getId());
@@ -95,7 +94,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
             player.networkHandler.sendPacket(posPacket);
         }
         {
-            EntityTrackerUpdateS2CPacket packet = PacketHelpers.createEntityTrackerUpdate();
+            EntityTrackerUpdateS2CPacket packet = HologramHelper.createUnsafe(EntityTrackerUpdateS2CPacket.class);
             EntityTrackerUpdateS2CPacketAccessor accessor = (EntityTrackerUpdateS2CPacketAccessor) packet;
 
             accessor.setId(this.entity.getId());
@@ -129,7 +128,7 @@ public class ArmorStandHologramElement extends AbstractHologramElement {
         Vec3d rot = player.getRotationVec(1.0f);
         Vec3d endPos = camPos.add(rot.x * d, rot.y * d, rot.z * d);
         Box box = player.getBoundingBox().stretch(rot.multiply(d)).expand(1.0, 1.0, 1.0);
-        EntityHitResult hitResult = ProjectileUtil.raycast(player, camPos, endPos, box, entity -> !entity.isSpectator() && entity.collides(), d * d);
+        EntityHitResult hitResult = ProjectileUtil.raycast(player, camPos, endPos, box, entity -> !entity.isSpectator() && entity.canHit(), d * d);
 
         //ServerMobsMod.LOGGER.info("onClick: type = "+type);
 

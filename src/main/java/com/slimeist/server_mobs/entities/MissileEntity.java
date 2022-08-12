@@ -293,7 +293,7 @@ public class MissileEntity extends ThrownEntity implements PolymerEntity, IServe
     }
 
     @Override
-    public boolean collides() {
+    public boolean canHit() {
         return true;
     }
 

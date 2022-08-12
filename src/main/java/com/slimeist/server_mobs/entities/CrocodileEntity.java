@@ -34,6 +34,7 @@ import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -504,7 +505,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
             if (CrocodileEntity.this.getAttributeValue(CHOMP_CHANCE) < 0.27 || CrocodileEntity.this.getAttributeValue(CHOMP_CHANCE) > 0.83) {
                 return false;
             }
-            return CrocodileEntity.this.age > this.startTime && CrocodileEntity.this.getRandom().nextDouble(7) < CrocodileEntity.this.getAttributeValue(CHOMP_CHANCE);
+            return CrocodileEntity.this.age > this.startTime && CrocodileEntity.this.getRandom().nextDouble()*7 < CrocodileEntity.this.getAttributeValue(CHOMP_CHANCE);
         }
 
         @Override
@@ -613,7 +614,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
 
     protected class LookAtTargetGoal extends Goal {
         public LookAtTargetGoal() {
-            this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
+            this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
         }
 
         @Override
@@ -729,7 +730,7 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         @Nullable
         private BlockPos generateTarget() {
             BlockPos blockpos = null;
-            final Random random = new Random();
+            final Random random = Random.create();
             final int range = 45;
             for (int i = 0; i < 15; i++) {
                 BlockPos blockPos = CrocodileEntity.this.getBlockPos().add(random.nextInt(range) - range / 2, 3, random.nextInt(range) - range / 2);

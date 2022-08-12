@@ -19,7 +19,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
@@ -147,17 +147,17 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
         return (seconds < 10 ? "0" : "") + seconds;
     }
 
-    static TranslatableText expirationText(ItemStack stack, World world) {
+    static Text expirationText(ItemStack stack, World world) {
         int ticks = (int) (getExpiration(stack) - world.getTime());
         int raw_seconds = ticks / 20;
 
         if (raw_seconds <= 60)
-            return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.seconds", str(raw_seconds));
+            return Text.translatable("tooltip.server_mobs.crocodile_flute.expiration_time.seconds", str(raw_seconds));
 
         int minutes = raw_seconds / 60;
         int seconds = raw_seconds % 60;
 
-        return new TranslatableText("tooltip.server_mobs.crocodile_flute.expiration_time.minutes_seconds", minutes, str(seconds));
+        return Text.translatable("tooltip.server_mobs.crocodile_flute.expiration_time.minutes_seconds", minutes, str(seconds));
     }
 
     @Override
@@ -172,7 +172,7 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
             if (context.isAdvanced() && world instanceof ServerWorld serverWorld) {
                 UUID uuid = getTargetUuid(stack, serverWorld);
                 if (uuid != null) {
-                    tooltip.add(new TranslatableText("tooltip.server_mobs.crocodile_flute.target_uuid", uuid.toString()));
+                    tooltip.add(Text.translatable("tooltip.server_mobs.crocodile_flute.target_uuid", uuid.toString()));
                 }
             }
         }

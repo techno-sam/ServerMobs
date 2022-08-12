@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -46,7 +46,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
         Vec3d rot = source.getRotationVec(0);
         Box box = source.getBoundingBox().stretch(rot.multiply(distance)).expand(1.0, 1.0, 1.0);
         boolean targetMissiles = false;
-        EntityHitResult entityResult = ProjectileUtil.raycast(source, start, start.add(rot.x * distance, rot.y * distance, rot.z * distance), box, e -> !e.isSpectator() && e.collides() && (!e.getType().equals(ServerMobsMod.MISSILE) || targetMissiles), distance * distance);
+        EntityHitResult entityResult = ProjectileUtil.raycast(source, start, start.add(rot.x * distance, rot.y * distance, rot.z * distance), box, e -> !e.isSpectator() && e.canHit() && (!e.getType().equals(ServerMobsMod.MISSILE) || targetMissiles), distance * distance);
         if (entityResult != null && entityResult.getEntity() != null && !entityResult.getEntity().isSpectator() && entityResult.getEntity().isAlive()) {
             return entityResult;
         } else {
@@ -63,15 +63,15 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
                 if (hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() != null) {
                     Text dispName = entityHitResult.getEntity().getDisplayName();
                     if (dispName != null) {
-                        player.sendMessage(new TranslatableText("tooltip.server_mobs.missile.target_locked_named", dispName), true);
+                        player.sendMessage(Text.translatable("tooltip.server_mobs.missile.target_locked_named", dispName), true);
                     } else {
-                        player.sendMessage(new TranslatableText("tooltip.server_mobs.missile.target_locked"), true);
+                        player.sendMessage(Text.translatable("tooltip.server_mobs.missile.target_locked"), true);
                     }
                     if (entityHitResult.getEntity() instanceof LivingEntity living) {
                         living.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 10, 0, false, false, false));
                     }
                 } else {
-                    player.sendMessage(new TranslatableText("tooltip.server_mobs.missile.no_target"), true);
+                    player.sendMessage(Text.translatable("tooltip.server_mobs.missile.no_target"), true);
                 }
             }
         }
@@ -102,7 +102,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
 
             if (false) {
                 ServerMobsMod.LOGGER.info("Missile fired at entity " + entityHitResult.getEntity().getName().getString());
-                String launchText = "Launched by " + user.getName().asString() + ", in direction:\n\tPitch: " + user.getPitch() + "\n\tYaw: " + user.getYaw();
+                String launchText = "Launched by " + user.getName().getContent() + ", in direction:\n\tPitch: " + user.getPitch() + "\n\tYaw: " + user.getYaw();
                 ServerMobsMod.LOGGER.info(launchText);
             }
             //user.sendMessage(new LiteralText(launchText.replace("\t", "    ")).setStyle(Style.EMPTY.withColor(Formatting.GOLD)), false);
@@ -112,7 +112,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
             stack.decrement(1);
             return TypedActionResult.success(stack);
         } else {
-            user.sendMessage(new TranslatableText("tooltip.server_mobs.missile.no_target"), true);
+            user.sendMessage(Text.translatable("tooltip.server_mobs.missile.no_target"), true);
             return TypedActionResult.fail(stack);
         }
     }
@@ -129,7 +129,7 @@ public class MissileItem extends SimplePolymerItem implements CustomModelItem {
     //FireworkStarItem tooltip
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(new TranslatableText("tooltip.server_mobs.missile"));
+        tooltip.add(Text.translatable("tooltip.server_mobs.missile"));
         NbtCompound nbtCompound = stack.getSubNbt("Explosion");
         if (nbtCompound != null) {
             FireworkStarItem.appendFireworkTooltip(nbtCompound, tooltip);

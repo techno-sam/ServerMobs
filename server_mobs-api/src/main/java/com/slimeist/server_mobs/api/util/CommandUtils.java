@@ -25,7 +25,7 @@ public class CommandUtils {
                 vec3d = new Vec3d(serverPlayerEntity.getX() + e / k * 2.0, serverPlayerEntity.getY() + f / k * 2.0, serverPlayerEntity.getZ() + g / k * 2.0);
                 j = minVolume;
             }
-            serverPlayerEntity.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound, category, vec3d, j, pitch));
+            serverPlayerEntity.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound, category, vec3d, j, pitch, serverPlayerEntity.world.getRandom().nextLong()));
             ++i;
         }
         return i;
