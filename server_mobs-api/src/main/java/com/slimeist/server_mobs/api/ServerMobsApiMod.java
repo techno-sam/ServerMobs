@@ -16,10 +16,6 @@ public class ServerMobsApiMod implements DedicatedServerModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final Path POLYMER_PACK_FILE = Path.of(FabricLoader.getInstance().getGameDir().toFile() + "/polymer-resourcepack.zip");
 
-    public static void sayHello() {
-        LOGGER.warn("Hello from server mobs api");
-    }
-
     @Override
     public void onInitializeServer() {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
