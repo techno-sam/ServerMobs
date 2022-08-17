@@ -32,7 +32,6 @@
     "minecraft": "~1.19",
     "java": ">=17",
     "polymer": "*",
-    "polymer-blocks-ext": "*",
     "hologram-api": "*"
   },
   "recommends": {
