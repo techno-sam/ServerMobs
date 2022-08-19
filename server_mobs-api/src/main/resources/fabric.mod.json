@@ -36,7 +36,8 @@
   },
   "recommends": {
     "server_translations_api": "*",
-    "polypack_host": "*"
+    "polypack_host": "*",
+    "polymer-autohost": "*"
   },
   "accessWidener": "server_mobs_api.accesswidener"
 }

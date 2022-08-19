@@ -19,9 +19,9 @@ public class ServerMobsApiMod implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            if (!FabricLoader.getInstance().isModLoaded("polypack_host")) {
+            if (!FabricLoader.getInstance().isModLoaded("polypack_host") && !FabricLoader.getInstance().isModLoaded("polymer-autohost")) {
                 CompletableFuture.runAsync(() -> {
-                    LOGGER.info("Building pack file because PolyPack Host is not loaded");
+                    LOGGER.info("Building pack file because neither polypack_host nor polymer-autohost are loaded");
                     PolymerRPUtils.build(POLYMER_PACK_FILE);
                 });
             }
