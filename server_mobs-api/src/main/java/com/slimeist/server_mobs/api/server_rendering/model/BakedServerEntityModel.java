@@ -1,5 +1,7 @@
 package com.slimeist.server_mobs.api.server_rendering.model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.slimeist.server_mobs.api.ServerMobsApiMod;
 import com.slimeist.server_mobs.api.mixin.ArmorStandEntityAccessor;
 import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntity;
@@ -15,6 +17,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.EulerAngle;
@@ -81,6 +84,12 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             NbtCompound nbt = displayStack.getOrCreateNbt();
 
             nbt.putInt("CustomModelData", data.value());
+            ModelDisplayPiece piece = this.displayPieces.get(group);
+            if (piece != null && piece.shiny) {
+                NbtList enchants = new NbtList();
+                enchants.add(new NbtCompound());
+                nbt.put("Enchantments", enchants);
+            }
 
             displayStack.setNbt(nbt);
             return displayStack;
@@ -239,7 +248,23 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
                 ModelGroup group = getModelGroup(path);
                 if (group != null) {
                     ModelDisplayPiece piece = this.displayPieces.get(group);
+                    piece.damageFlash = damageFlash;
+                    piece.invisible = invisible;
                     piece.armorStand.equipStack(EquipmentSlot.HEAD, invisible ? ItemStack.EMPTY : createDisplayStack(group, damageFlash));
+                    if (hologram.getElement(piece.elementID) instanceof ArmorStandHologramElement armorStandHologramElement) {
+                        armorStandHologramElement.markEquipmentDirty();
+                    }
+                }
+            }
+        }
+
+        public void setShiny(boolean shiny) {
+            for (String path : getChildPaths(this.parent.base())) {
+                ModelGroup group = getModelGroup(path);
+                if (group != null) {
+                    ModelDisplayPiece piece = this.displayPieces.get(group);
+                    piece.shiny = shiny;
+                    piece.armorStand.equipStack(EquipmentSlot.HEAD, piece.invisible ? ItemStack.EMPTY : createDisplayStack(group, piece.damageFlash));
                     if (hologram.getElement(piece.elementID) instanceof ArmorStandHologramElement armorStandHologramElement) {
                         armorStandHologramElement.markEquipmentDirty();
                     }
@@ -389,6 +414,9 @@ public record BakedServerEntityModel(int texWidth, int texHeight,
             public boolean parentLocalMovement;
             public Vec3d parentRelativePivot;
             public EulerAngle relativeRotation;
+            public boolean shiny = false;
+            public boolean damageFlash = false;
+            public boolean invisible = false;
 
             public ModelDisplayPiece(ArmorStandEntity armorStand, int elementID, Vec3d pivot, Vec3d base_offset, String path) {
                 this(armorStand, elementID, pivot, base_offset, path, null, false);
