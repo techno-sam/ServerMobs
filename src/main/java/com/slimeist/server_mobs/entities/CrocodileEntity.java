@@ -7,10 +7,8 @@ import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntit
 import com.slimeist.server_mobs.api.server_rendering.model.BakedServerEntityModel;
 import com.slimeist.server_mobs.mixin.EntityAccessor;
 import eu.pb4.polymer.api.entity.PolymerEntity;
-import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.control.AquaticMoveControl;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.*;
@@ -29,16 +27,18 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 //use HologramAPI for model display
@@ -840,6 +840,6 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
     }
 
     public static void registerSpawnRestrictions(EntityType<? extends CrocodileEntity> type) {
-        SpawnRestrictionAccessor.callRegister(type, SpawnRestriction.Location.IN_WATER, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, CrocodileEntity::canSpawn);
+        SpawnRestriction.register(type, SpawnRestriction.Location.IN_WATER, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, CrocodileEntity::canSpawn);
     }
 }
