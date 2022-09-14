@@ -35,7 +35,7 @@
     "polymer-blocks-ext": "*",
     "hologram-api": "*",
     "nbtcrafting": "*",
-    "server_mobs_api": "${api_version}"
+    "server_mobs_api": ">=${api_version}"
   },
   "recommends": {
     "server_translations_api": "*",
