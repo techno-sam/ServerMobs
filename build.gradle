@@ -42,10 +42,10 @@ allprojects {
 		// Fabric API. This is technically optional, but you probably want it anyway.
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-		modImplementation include("eu.pb4:polymer:0.2.13+1.19.2") //https://maven.nucleoid.xyz/eu/pb4/polymer/
+		modImplementation include("eu.pb4:polymer:0.2.16+1.19.2") //https://maven.nucleoid.xyz/eu/pb4/polymer/
 		modImplementation include("eu.pb4:polymer-blocks:0.1.0-alpha.8+1.19.2") //https://maven.nucleoid.xyz/eu/pb4/polymer-blocks/
 		modImplementation include("eu.pb4:hologram-api:0.2.2+1.19") //https://maven.nucleoid.xyz/eu/pb4/hologram-api/
-		modImplementation include("fr.catcore:server-translations-api:1.4.16+1.19") //https://maven.nucleoid.xyz/fr/catcore/server-translations-api/
+		modImplementation include("fr.catcore:server-translations-api:1.4.17+1.19.2") //https://maven.nucleoid.xyz/fr/catcore/server-translations-api/
 		modImplementation "eu.pb4:polymer-autohost:0.1.2+1.19.2"
 	}
 
