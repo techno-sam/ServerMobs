@@ -28,6 +28,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.registry.Registry;
@@ -279,6 +280,8 @@ public class CrocodileEntity extends HostileEntity implements PolymerEntity, ISe
         baseFlag = modifyFlag(baseFlag, 6, this.isGlowing()); //set glowing
         baseFlag = modifyFlag(baseFlag, ON_FIRE_FLAG_INDEX, this.doesRenderOnFire());
         data.add(new DataTracker.Entry<>(FLAGS, baseFlag));
+        data.add(new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(Text.translatable("entity.server_mobs.crocodile"))));
+        data.add(new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), true));
         data.add(new DataTracker.Entry<>(EntityAccessor.getSILENT(), true));
     }
 

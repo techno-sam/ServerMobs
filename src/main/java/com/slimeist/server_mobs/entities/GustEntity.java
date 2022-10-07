@@ -103,7 +103,7 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
         baseFlag = modifyFlag(baseFlag, ON_FIRE_FLAG_INDEX, this.doesRenderOnFire());
         data.add(new DataTracker.Entry<>(FLAGS, baseFlag));
         data.add(new DataTracker.Entry<>(EntityAccessor.getSILENT(), false));
-        data.add(new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(Text.literal("Gust"))));
+        data.add(new DataTracker.Entry<>(EntityAccessor.getCUSTOM_NAME(), Optional.of(Text.translatable("entity.server_mobs.gust"))));
         data.add(new DataTracker.Entry<>(EntityAccessor.getNAME_VISIBLE(), true));
     }
 
