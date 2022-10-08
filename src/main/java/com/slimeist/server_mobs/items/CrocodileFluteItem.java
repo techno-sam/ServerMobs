@@ -127,6 +127,8 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
+        if (!ServerMobsMod.getConfig().isCrocodileFluteEnabled)
+            return TypedActionResult.fail(stack);
         if (world instanceof ServerWorld serverWorld) {
             LivingEntity target = getTarget(stack, serverWorld);
             if (target != null) {
@@ -163,6 +165,10 @@ public class CrocodileFluteItem extends BlockItem implements PolymerItem, Custom
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
+        if (!ServerMobsMod.getConfig().isCrocodileFluteEnabled) {
+            tooltip.add(Text.translatable("tooltip.server_mobs.disabled"));
+            return;
+        }
         if (world != null) {
             if (hasTarget(stack, world)) {
                 tooltip.add(expirationText(stack, world));

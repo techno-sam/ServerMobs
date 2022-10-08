@@ -23,5 +23,6 @@
   "tooltip.server_mobs.missile.no_target": "\u00A74No Target\u00A7r",
   "tooltip.server_mobs.crocodile_flute.expiration_time.seconds": "Target expires in: \u00A74\u00A7l%s seconds\u00A7r",
   "tooltip.server_mobs.crocodile_flute.expiration_time.minutes_seconds": "Target expires in: \u00A74\u00A7l%s:%s\u00A7r",
-  "tooltip.server_mobs.crocodile_flute.target_uuid": "Target UUID: \u00A75\u00A7l%s\u00A7r"
+  "tooltip.server_mobs.crocodile_flute.target_uuid": "Target UUID: \u00A75\u00A7l%s\u00A7r",
+  "tooltip.server_mobs.disabled": "Feature disabled by config"
 }

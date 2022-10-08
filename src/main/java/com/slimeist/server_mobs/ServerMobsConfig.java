@@ -16,6 +16,10 @@ public class ServerMobsConfig {
     public float fluteCrocodileSpeedMultiplier = 1.45f;
     public int fluteTargetExpirationTicks = 90 * 20;
 
+    public boolean doCrocodileSpawning = true;
+    public boolean isCrocodileFluteEnabled = true;
+    public boolean isCrocodileArmorEnabled = true;
+
     public static ServerMobsConfig loadConfig(File file) {
         ServerMobsConfig config;
 

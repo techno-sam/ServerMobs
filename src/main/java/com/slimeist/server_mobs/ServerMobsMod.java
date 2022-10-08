@@ -120,7 +120,7 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
 
     //ARMOR
     private static CustomArmorItem crocodileArmor(Item armorBase) {
-        return new CustomArmorItem((ArmorItem) armorBase, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT));
+        return new CustomArmorItem((ArmorItem) armorBase, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT), !getConfig().isCrocodileArmorEnabled);
     }
 
     public static final CustomArmorItem CROCODILE_HEAD = new CustomArmorItem((ArmorItem) Items.LEATHER_HELMET, Items.SLIME_BALL, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT));
@@ -134,6 +134,8 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
     }
 
     public static ServerMobsConfig getConfig() {
+        if (config == null)
+            config = ServerMobsConfig.loadConfig(new File(getConfigPath().toString()));
         return config;
     }
 
@@ -144,7 +146,6 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
         LOGGER.info("ServerMobs loading");
-        config = ServerMobsConfig.loadConfig(new File(getConfigPath().toString()));
 
         if (PolymerRPUtils.addAssetSource(MOD_ID)) {
             LOGGER.info("Successfully marked as asset source");
@@ -183,14 +184,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
         PolymerEntityUtils.registerType(CROCODILE);
 
         CrocodileEntity.registerSpawnRestrictions(CROCODILE);
-        BiomeModifications.addSpawn(
+        if (getConfig().doCrocodileSpawning) {
+            BiomeModifications.addSpawn(
                 biomeSelectionContext -> biomeSelectionContext.getBiomeRegistryEntry().isIn(BiomeTags.ALLOWS_SURFACE_SLIME_SPAWNS),
                 CROCODILE.getSpawnGroup(),
                 CROCODILE,
                 12,
                 2,
                 4
-        );
+            );
+        }
     }
 
     public static Identifier id(String path) {
