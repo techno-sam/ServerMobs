@@ -37,6 +37,7 @@ public class ServerEntityModelLoader {
     protected BakedServerEntityModel bakedModel = null;
     private boolean forceMarker = false;
     private final String model_name_override;
+    private boolean alreadyRanResourceGen = false;
 
     public ServerEntityModelLoader(EntityType<?> entityType) {
         this(entityType, null);
@@ -324,6 +325,8 @@ public class ServerEntityModelLoader {
     }
 
     public BakedServerEntityModel getBakedModel() {
+        if (bakedModel == null && !alreadyRanResourceGen && ServerMobsApiMod.forceRPBuild())
+            alreadyRanResourceGen = true;
         return bakedModel;
     }
 }

@@ -38,4 +38,9 @@ public class ServerMobsApiMod implements DedicatedServerModInitializer {
             }
         });
     }
+
+    public static boolean forceRPBuild() {
+        LOGGER.info("Forcing resourcepack build, because it was requested by a mod");
+        return PolymerRPUtils.build(POLYMER_PACK_FILE);
+    }
 }
