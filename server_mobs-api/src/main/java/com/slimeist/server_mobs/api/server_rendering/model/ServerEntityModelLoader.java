@@ -80,7 +80,7 @@ public class ServerEntityModelLoader {
         String texture_tint_loc_out = "assets/" + id.getNamespace() + "/textures/entity/" + id.getPath() + "_tint.png";
         String model_loc_out = "assets/" + id.getNamespace() + "/models/entity/" + id.getPath() + "/";
 
-        builder.copyModAssets(id.getNamespace());
+        builder.copyAssets(id.getNamespace());
 
         //copy texture
         builder.addData(texture_loc_out, builder.getData(texture_loc_in));
