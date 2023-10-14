@@ -19,6 +19,7 @@ public class ServerMobsConfig {
     public boolean doCrocodileSpawning = true;
     public boolean isCrocodileFluteEnabled = true;
     public boolean isCrocodileArmorEnabled = true;
+    public boolean isWolfArmorEnabled = true;
 
     public static ServerMobsConfig loadConfig(File file) {
         ServerMobsConfig config;

@@ -35,3 +35,7 @@ run/
 # nano
 
 *.swp
+
+# Other
+/src/main/resources/assets/server_mobs/textures/entity/crocodile.png
+/src/main/resources/assets/minecraft/textures/entity/wolf/

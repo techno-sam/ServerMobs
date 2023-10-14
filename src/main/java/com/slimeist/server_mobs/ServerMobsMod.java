@@ -1,6 +1,5 @@
 package com.slimeist.server_mobs;
 
-import com.slimeist.server_mobs.api.ServerMobsApiMod;
 import com.slimeist.server_mobs.api.server_rendering.model.ServerEntityModelLoader;
 import com.slimeist.server_mobs.blocks.CrocodileFluteBlock;
 import com.slimeist.server_mobs.entities.CrocodileEntity;
@@ -29,7 +28,6 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.tag.BiomeTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +127,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
     public static final CustomArmorItem CROCODILE_HIDE_LEGGINGS = crocodileArmor(Items.LEATHER_LEGGINGS);
     public static final CustomArmorItem CROCODILE_HIDE_BOOTS = crocodileArmor(Items.LEATHER_BOOTS);
 
+
+    private static CustomArmorItem wolfArmor(Item armorBase) {
+        return new CustomArmorItem((ArmorItem) armorBase, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT), !getConfig().isWolfArmorEnabled);
+    }
+
+    public static final WolfHeadArmorItem WOLF_HEAD = new WolfHeadArmorItem((ArmorItem) Items.LEATHER_HELMET, Items.SLIME_BALL, ArmorMaterials.CHAIN, new FabricItemSettings().group(ItemGroup.COMBAT));
+    public static final CustomArmorItem WOLF_SUIT_CHESTPLATE = wolfArmor(Items.LEATHER_CHESTPLATE);
+    public static final CustomArmorItem WOLF_SUIT_LEGGINGS = wolfArmor(Items.LEATHER_LEGGINGS);
+    public static final CustomArmorItem WOLF_SUIT_BOOTS = wolfArmor(Items.LEATHER_BOOTS);
+
     private static Path getConfigPath() {
         return FabricLoader.getInstance().getConfigDir().resolve("server_mobs.json");
     }
@@ -174,6 +182,20 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
         CROCODILE_HIDE_CHESTPLATE.setCustomArmorColor(crocodileArmorModel.value());
         CROCODILE_HIDE_LEGGINGS.setCustomArmorColor(crocodileArmorModel.value());
         CROCODILE_HIDE_BOOTS.setCustomArmorColor(crocodileArmorModel.value());
+
+        registerCustomModelItem(WOLF_HEAD, "wolf_head");
+        registerCustomModelItem(WOLF_SUIT_CHESTPLATE, "wolf_suit_chestplate");
+        registerCustomModelItem(WOLF_SUIT_LEGGINGS, "wolf_suit_leggings");
+        registerCustomModelItem(WOLF_SUIT_BOOTS, "wolf_suit_boots");
+        {
+            PolymerModelData data = PolymerRPUtils.requestModel(WOLF_HEAD.getPolymerItem(new ItemStack(WOLF_HEAD, 1), null), id("item/wolf_head_angry"));
+            WOLF_HEAD.setAngryData(data.value());
+        }
+
+        PolymerArmorModel wolfArmorModel = PolymerRPUtils.requestArmor(id("wolf_suit"));
+        WOLF_SUIT_CHESTPLATE.setCustomArmorColor(wolfArmorModel.value());
+        WOLF_SUIT_LEGGINGS.setCustomArmorColor(wolfArmorModel.value());
+        WOLF_SUIT_BOOTS.setCustomArmorColor(wolfArmorModel.value());
 
         //Entities
         FabricDefaultAttributeRegistry.register(GUST, GustEntity.createGustAttributes());

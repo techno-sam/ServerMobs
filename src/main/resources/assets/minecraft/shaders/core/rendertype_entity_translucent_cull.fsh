@@ -20,16 +20,9 @@ out vec4 fragColor;
 
 void main() {
     vec4 color = texture(Sampler0, texCoord0);
-
-    vec4 vtc = vertexColor;
-
-    if (is_emissive(Sampler0)) {
-        vec4 textureProperties = get_texture_properties(Sampler0);
-        vtc = get_light(textureProperties, color, vertexColor);
-        color.a = get_alpha(textureProperties, color);
-    }
-
-    color *= vtc * ColorModulator;
+    vec4 lightColor = vertexColor * ColorModulator;
+    float alpha = textureLod(Sampler0, texCoord0, 0.0).a;
+    color = make_emissive(color, lightColor, alpha);
     if (color.a < 0.1) {
         discard;
     }

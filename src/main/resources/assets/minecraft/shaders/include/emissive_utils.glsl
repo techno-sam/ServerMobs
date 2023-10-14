@@ -1,49 +1,24 @@
 #version 150
 
-/*
-    Format:
-    (x, y): DESC         (r, g, b, a)
-    ---------------------------------
-    (0, 1): Marker pixel (1, 0, 1, 1)
-    (1, 1): textureProperties (e, a, b, c)
-    if e == 1:
-        pixels with the same alpha value as textureProperties become emissive with brightness b and alpha a
-    if e > 1:
-        everything is AWESOME err.. emissive with brightness b
-    */
-
 bool check_alpha(float textureAlpha, float targetAlpha) {
     float targetLess = targetAlpha - 0.01;
     float targetMore = targetAlpha + 0.01;
     return (textureAlpha > targetLess && textureAlpha < targetMore);
 }
 
-bool is_emissive(sampler2D tex) {
-    return texelFetch(tex, ivec2(0, 1), 0) == vec4(1, 0, 1, 1);
+// Makes sure transparent things don't become solid and vice versa.
+float remap_alpha(float inputAlpha) {
+
+    if (check_alpha(inputAlpha, 250.0/255.0)) return 1.0; // Crocodile & Wolf eyes
+
+    return float(inputAlpha); // If a pixel doesn't need to have its alpha changed then it simply does not change.
 }
 
-vec4 get_texture_properties(sampler2D tex) {
-    return texelFetch(tex, ivec2(1, 1), 0) * 255;
-}
 
-vec4 get_light(vec4 textureProperties, vec4 tex_color, vec4 original) {
-    if (textureProperties.r == 1) {
-        if (check_alpha(tex_color.a*255, textureProperties.a))
-        {
-            return vec4(textureProperties.b/255);
-        }
-    } else if (textureProperties.r > 1) {
-        return vec4(textureProperties.b/255);
-    }
-    return original;
-}
+vec4 make_emissive(vec4 inputColor, vec4 lightColor, float inputAlpha) {
+    inputColor.a = remap_alpha(inputAlpha); // Remap the alpha value
 
-float get_alpha(vec4 textureProperties, vec4 tex_color) {
-    if (textureProperties.r == 1) {
-        if (check_alpha(tex_color.a*255, textureProperties.a))
-        {
-            return textureProperties.g/255;
-        }
-    }
-    return tex_color.a;
+    if (check_alpha(inputAlpha, 250.0/255.0)) return inputColor;
+
+    return inputColor * lightColor; // If none of the pixels are supposed to be emissive, then it adds the light.
 }

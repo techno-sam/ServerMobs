@@ -9,6 +9,7 @@
   "server": [
     "BambooBlockMixin",
     "BambooSaplingBlockMixin",
-    "EntityAccessor"
+    "EntityAccessor",
+    "ArmorItemAccessor"
   ]
 }

@@ -1,0 +1,6 @@
+{
+	"parent": "server_mobs:item/wolf_head",
+	"textures": {
+		"0": "entity/wolf/wolf_angry"
+	}
+}
