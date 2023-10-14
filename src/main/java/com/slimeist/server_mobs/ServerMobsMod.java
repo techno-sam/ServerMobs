@@ -14,6 +14,7 @@ import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -24,6 +25,10 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.tag.BiomeTags;
 import net.minecraft.util.Identifier;
@@ -216,6 +221,21 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
                 4
             );
         }
+
+        LootTableEvents.MODIFY.register(((resourceManager, lootManager, id, tableBuilder, source) -> {
+            if (id.equals(new Identifier("chests/village/village_tannery"))) {
+                tableBuilder.pool(LootPool.builder()
+                    .with(ItemEntry.builder(WOLF_SUIT_CHESTPLATE))
+                    .with(ItemEntry.builder(WOLF_SUIT_LEGGINGS))
+                    .with(ItemEntry.builder(WOLF_SUIT_BOOTS))
+                    .rolls(UniformLootNumberProvider.create(0.0f, 1.8f))
+                    .build());
+            } else if (id.equals(new Identifier("chests/igloo_chest"))) {
+                tableBuilder.pool(LootPool.builder()
+                    .with(ItemEntry.builder(WOLF_HEAD))
+                    .build());
+            }
+        }));
     }
 
     public static Identifier id(String path) {

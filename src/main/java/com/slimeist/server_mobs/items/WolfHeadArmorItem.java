@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -63,15 +64,11 @@ public class WolfHeadArmorItem extends CustomArmorItem {
             if (shouldBeAngry != isAngry) {
                 setAngry(stack, shouldBeAngry);
 
-                if (shouldBeAngry) {
+                if (slot == getSlotType().getEntitySlotId()) {
                     serverPlayer.world.playSound(
                         null, serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(),
-                        SoundEvents.ENTITY_WOLF_HOWL, SoundCategory.PLAYERS, 1.0f, 1.0f
-                    );
-                } else {
-                    serverPlayer.world.playSound(
-                        null, serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(),
-                        SoundEvents.ENTITY_WOLF_WHINE, SoundCategory.PLAYERS, 0.5f, 1.0f
+                        shouldBeAngry ? SoundEvents.ENTITY_WOLF_HOWL : SoundEvents.ENTITY_WOLF_WHINE,
+                        SoundCategory.PLAYERS, 1.0f, 1.0f
                     );
                 }
             }
