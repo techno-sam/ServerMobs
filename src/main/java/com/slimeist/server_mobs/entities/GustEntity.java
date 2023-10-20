@@ -3,6 +3,7 @@ package com.slimeist.server_mobs.entities;
 import com.slimeist.server_mobs.api.server_rendering.entity.IServerRenderedEntity;
 import com.slimeist.server_mobs.api.server_rendering.model.BakedServerEntityModel;
 import com.slimeist.server_mobs.mixin.EntityAccessor;
+import com.slimeist.server_mobs.pentagram.PentagramParticles;
 import eu.pb4.holograms.mixin.accessors.SlimeEntityAccessor;
 import eu.pb4.polymer.api.entity.PolymerEntity;
 import net.minecraft.block.BlockState;
@@ -20,6 +21,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralTextContent;
@@ -130,6 +132,9 @@ public class GustEntity extends HostileEntity implements PolymerEntity, IServerR
     public void tick() {
         super.tick();
         this.getModelInstance().updateHologram();
+        if (this.world instanceof ServerWorld serverWorld) {
+            new PentagramParticles(serverWorld, new BlockPos(81, 80, 1)).spawn();
+        }
     }
 
     @Override

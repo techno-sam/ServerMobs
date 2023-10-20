@@ -10,6 +10,7 @@
     "BambooBlockMixin",
     "BambooSaplingBlockMixin",
     "EntityAccessor",
-    "ArmorItemAccessor"
+    "ArmorItemAccessor",
+    "SoulFireBlockMixin"
   ]
 }

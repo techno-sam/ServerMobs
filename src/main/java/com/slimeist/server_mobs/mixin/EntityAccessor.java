@@ -45,4 +45,7 @@ public interface EntityAccessor {
     static TrackedData<Integer> getFROZEN_TICKS() {
         throw new AssertionError();
     }
+
+    @Accessor
+    void setHasVisualFire(boolean hasVisualFire);
 }

@@ -6,6 +6,10 @@ import com.slimeist.server_mobs.entities.CrocodileEntity;
 import com.slimeist.server_mobs.entities.GustEntity;
 import com.slimeist.server_mobs.entities.MissileEntity;
 import com.slimeist.server_mobs.items.*;
+import com.slimeist.server_mobs.pentagram.PentagramCoreBlock;
+import com.slimeist.server_mobs.pentagram.PentagramCoreBlockEntity;
+import com.slimeist.server_mobs.pentagram.TestPentagramCommand;
+import eu.pb4.polymer.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.api.item.PolymerItem;
 import eu.pb4.polymer.api.resourcepack.PolymerArmorModel;
@@ -13,21 +17,23 @@ import eu.pb4.polymer.api.resourcepack.PolymerModelData;
 import eu.pb4.polymer.api.resourcepack.PolymerRPUtils;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.tag.BiomeTags;
@@ -61,6 +67,16 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
                     .group(ItemGroup.COMBAT)
                     .maxDamage(25),
             Items.CARROT_ON_A_STICK);
+
+    public static final PentagramCoreBlock PENTAGRAM_CORE_BLOCK = new PentagramCoreBlock(FabricBlockSettings
+        .of(Material.FIRE, MapColor.LIGHT_BLUE)
+        .noCollision()
+        .breakInstantly()
+        .luminance(10)
+        .sounds(BlockSoundGroup.WOOL)
+        .ticksRandomly());
+    public static final BlockEntityType<PentagramCoreBlockEntity> PENTAGRAM_CORE_BE = FabricBlockEntityTypeBuilder
+        .create(PentagramCoreBlockEntity::new, PENTAGRAM_CORE_BLOCK).build();
 
     //ITEMS
     public static final MissileItem MISSILE_ITEM = new MissileItem(
@@ -222,6 +238,12 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
             );
         }
 
+        Registry.register(Registry.BLOCK, id("pentagram_core"), PENTAGRAM_CORE_BLOCK);
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, id("pentagram_core"), PENTAGRAM_CORE_BE);
+        PolymerBlockUtils.registerBlockEntity(PENTAGRAM_CORE_BE);
+
+        // Events
+
         LootTableEvents.MODIFY.register(((resourceManager, lootManager, id, tableBuilder, source) -> {
             if (id.equals(new Identifier("chests/village/village_tannery"))) {
                 tableBuilder.pool(LootPool.builder()
@@ -235,6 +257,10 @@ public class ServerMobsMod implements DedicatedServerModInitializer {
                     .with(ItemEntry.builder(WOLF_HEAD))
                     .build());
             }
+        }));
+
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(TestPentagramCommand.register());
         }));
     }
 
